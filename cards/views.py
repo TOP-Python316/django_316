@@ -1,3 +1,6 @@
-from django.shortcuts import render
+# ./cards/views.py
+from django.http import HttpResponse
 
-# Create your views here.
+
+def main(request):
+    return HttpResponse('Hello world!')  # Вернёт страницу с надписью "Hello world!"
