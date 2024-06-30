@@ -1,5 +1,6 @@
 # ./cards/views.py
 from django.http import HttpResponse
+from django.shortcuts import render
 
 
 def main(request):
@@ -13,4 +14,4 @@ def card_by_id(request, card_id):
 
 
 def get_all_cards(request):
-    return HttpResponse('Все карточки')  # Вернёт страницу с надписью "Все карточки"
+    return render(request, 'cards/catalog.html')
