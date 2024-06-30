@@ -12,7 +12,10 @@
         <nav>
             <ul>
                 {% for item in menu %}
-                    <li>{{ item }}</li>                    
+                    <li>{{ item }}</li> 
+                    {% if not forloop.last %} 
+                        <hr>
+                    {% endif %}                  
                 {% endfor %}
             </ul>
         </nav>
@@ -22,7 +25,9 @@
         <h1>Каталог карточек</h1>
         <p>Всего карточек: {{ cards_count }}</p>
         <p>Всего пользователей: {{ users_count }}</p>
-        <p>Список {{ menu }}</p>
+        <p>Список элемент 0 {{ menu.0 }}</p>
+        <p>Список элемент 1 {{ menu.1 }}</p>
+        <p>Список элемент 2 {{ menu.2 }}</p>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </body>
