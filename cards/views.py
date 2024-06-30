@@ -3,6 +3,13 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 
+info = {
+    "users_count": 100600,
+    "cards_count": 100600,
+    "menu": ["Главная", "О проекте", "Каталог"],
+}
+
+
 def main(request):
     return HttpResponse('Hello world!')  # Вернёт страницу с надписью "Hello world!"
 
@@ -14,4 +21,7 @@ def card_by_id(request, card_id):
 
 
 def get_all_cards(request):
-    return render(request, 'cards/catalog.html')
+    """
+    Принимает информацию о проекте (словарь info)
+    """
+    return render(request, 'cards/catalog.html', context=info)
