@@ -12,7 +12,9 @@
         <nav>
             <ul>
                 {% for item in menu %}
-                    <li>{{ item }}</li> 
+                    <li>
+                        <a href="{{ item.url }}" title="{{ item.title }}">{{ item.title }}</a>
+                    </li> 
                     {% if not forloop.last %} 
                         <hr>
                     {% endif %}                  

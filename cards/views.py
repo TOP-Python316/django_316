@@ -6,7 +6,17 @@ from django.shortcuts import render
 info = {
     "users_count": 100600,
     "cards_count": 100600,
-    "menu": ["Главная", "О проекте", "Каталог"],
+    "menu": [
+        {"title": "Главная",
+         "url": "/",
+         "url_name": "index"},
+        {"title": "О проекте",
+         "url": "/about/",
+         "url_name": "about"},
+        {"title": "Каталог",
+         "url": "/cards/catalog/",
+         "url_name": "catalog"},
+    ]
 }
 
 
