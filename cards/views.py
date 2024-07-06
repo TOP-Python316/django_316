@@ -11,7 +11,7 @@ from django.shortcuts import render
 
 
 def main(request):
-    return render(request, 'base.html')
+    return render(request, 'main.html')
 
 
 def get_all_cards(request):
