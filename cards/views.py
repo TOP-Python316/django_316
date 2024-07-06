@@ -24,10 +24,16 @@ def main(request):
     return HttpResponse('Hello world!')  # Вернёт страницу с надписью "Hello world!"
 
 
-def card_by_id(request, card_id):
-    if card_id > 10:
-        return HttpResponse('Карточка не найдена', status=404)
-    return HttpResponse(f'Вы открыли карточку {card_id}')  # Вернёт страницу с надписью "Вы открыли карточку {card_id}"
+def catalog(request):
+    return HttpResponse('Каталог карточек')
+
+
+def get_card_by_id(request, card_id):
+    return HttpResponse(f'Карточка {card_id}')
+
+
+def get_category_by_name(request, slug):
+    return HttpResponse(f'Категория {slug}')
 
 
 def get_all_cards(request):

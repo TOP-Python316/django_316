@@ -139,3 +139,11 @@ info = {
    - **Параметры**: Введите `runserver`, чтобы запустить разработческий сервер Django.
 
 **commit: `lesson_47: настроили запуск django-сервера по кнопке`**
+
+### Сделали практику
+- Описали маршруты /catalog, catalog/<int:card_id/>, catalog/<slug:slug> и создали соответствующие представления в файле views.py
+- catalog возвращает HttpResponse("Каталог карточек")
+- get_card_by_id возвращает HttpResponse(f"Карточка {card_id}")
+- get_category_by_name возвращает HttpResponse(f"Карточка {slug}")
+
+**commit: `lesson_47: добавили новые маршруты`**
