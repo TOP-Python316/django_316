@@ -7,6 +7,11 @@ get_detail_card_by_id - возвращает детальную информац
 """
 
 from django.http import HttpResponse
+from django.shortcuts import render
+
+
+def main(request):
+    return render(request, 'base.html')
 
 
 def get_all_cards(request):
