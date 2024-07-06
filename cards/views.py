@@ -1,43 +1,44 @@
-# ./cards/views.py
+"""
+get_all_cards - возвращает все карточки для представления в каталоге
+get_categories - возвращает все категории для представления в каталоге
+get_cards_by_category - возвращает карточки по категории для представления в каталоге
+get_cards_by_tag - возвращает карточки по тегу для представления в каталоге
+get_detail_card_by_id - возвращает детальную информацию по карточке для представления
+"""
+
 from django.http import HttpResponse
-from django.shortcuts import render
-
-
-info = {
-    "users_count": 100600,
-    "cards_count": 100600,
-    "menu": [
-        {"title": "Главная",
-         "url": "/",
-         "url_name": "index"},
-        {"title": "О проекте",
-         "url": "/about/",
-         "url_name": "about"},
-        {"title": "Каталог",
-         "url": "/cards/catalog/",
-         "url_name": "catalog"},
-    ]
-}
-
-
-def main(request):
-    return HttpResponse('Hello world!')  # Вернёт страницу с надписью "Hello world!"
-
-
-def catalog(request):
-    return HttpResponse('Каталог карточек')
-
-
-def get_card_by_id(request, card_id):
-    return HttpResponse(f'Карточка {card_id}')
-
-
-def get_category_by_name(request, slug):
-    return HttpResponse(f'Категория {slug}')
 
 
 def get_all_cards(request):
     """
-    Принимает информацию о проекте (словарь info)
+    Возвращает все карточки для представления в каталоге
     """
-    return render(request, 'cards/catalog.html', context=info)
+    return HttpResponse('All cards')
+
+
+def get_categories(request):
+    """
+    Возвращает все категории для представления в каталоге
+    """
+    return HttpResponse('All categories')
+
+
+def get_cards_by_category(request, slug):
+    """
+    Возвращает карточки по категории для представления в каталоге
+    """
+    return HttpResponse(f'Cards by category {slug}')
+
+
+def get_cards_by_tag(request, slug):
+    """
+    Возвращает карточки по тегу для представления в каталоге
+    """
+    return HttpResponse(f'Cards by tag {slug}')
+
+
+def get_detail_card_by_id(request, card_id):
+    """
+    Возвращает детальную информацию по карточке для представления
+    """
+    return HttpResponse(f'Detail card by id {card_id}')
