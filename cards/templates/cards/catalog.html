@@ -8,4 +8,11 @@
     <h1>Каталог карточек Anki для интервального повторения</h1>
     <p>Здесь вы можете выбрать карточки для изучения</p>
     <p>На текущий момент, у нас карточек: {{ cards_count }} и пользователей: {{ users_count }} </p>
+    <ul>
+        {% for card in cards %}
+            <li>
+                {% include "includes/card_preview.html" %}
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock %}
