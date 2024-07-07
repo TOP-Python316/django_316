@@ -235,3 +235,7 @@ info = {
 HOTFIX: `templatetags` перенесён в cards из `cards/templates`
 
 **commit: `lesson_48: исправлена ошибка местонахождения templatetags`**
+
+тестовое изменение для создания коммита
+
+**commit: `lesson_48: тестовое изменение для создания коммита`**
