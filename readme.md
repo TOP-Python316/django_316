@@ -231,3 +231,7 @@ info = {
 Так же, в шаблон был добавлен цикл для вывода тегов карточки.
 
 **commit: `lesson_48: работа с фильтрами в шаблонах`**
+
+HOTFIX: `templatetags` перенесён в cards из `cards/templates`
+
+**commit: `lesson_48: исправлена ошибка местонахождения templatetags`**
