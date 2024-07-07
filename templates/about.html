@@ -1,10 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% comment %} template/about.html шаблон, расширяющий базовый шаблон base.html {% endcomment %}
+
+{% block title %}О сайте{% endblock %}
+
+{% block content %}
+    <h1>О сайте</h1>
+    <p>Добро пожаловать на наш сайт!</p>
+    <p>На нашем сайте, карточек {{ cards_count }}, пользователей {{ users_count }}.</p>
+{% endblock %}

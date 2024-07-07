@@ -95,14 +95,14 @@ def main(request):
 
 def about(request):
     """Представление рендерит шаблон about.html"""
-    return render(request, 'about.html')
+    return render(request, 'about.html', context=info)
 
 
 def get_all_cards(request):
     """
     Возвращает все карточки для представления в каталоге
     """
-    return HttpResponse('All cards')
+    return render(request, 'cards/catalog.html', context=info)
 
 
 def get_categories(request):
