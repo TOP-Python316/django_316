@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% load markdown_to_html %}
+{% load markdown_to_html_2 %}
 {% block content %}
 <!-- Детальное представление карточки cards/templates/cards/include/card_preview.html -->
 <div class="card" style="width: 18rem;">
     <div class="card-body">
-      <h5 class="card-title">{{ card.question }}</h5>
+      <h5 class="card-title">{% markdown_to_html2 card.question %}</h5>
       <p class="card-text"> {% markdown_to_html card.answer %} </p>
       <p class="card-text">{{ card.category }}</p>
       <p class="card-text">{{ card.tags }}</p>

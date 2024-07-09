@@ -243,3 +243,11 @@ HOTFIX: `templatetags` перенесён в cards из `cards/templates`
 тестовое изменение для создания коммита II
 
 **commit: `lesson_48: тестовое изменение для создания коммита II`**
+
+### Сделаем второй вариант шаблонного тега `markdown_to_html` через `inclusion_tag`
+- Создали второй вариант шаблонного тега `markdown_to_html` через `inclusion_tag` в файле `cards/templatetags/markdown_to_html.py`
+- Создали шаблон `markdown_to_html.html` в папке `templates/cards`
+- Протестировали его в представлении `card_detail` в шаблоне `card_detail.html`
+- Сравнили работу двух вариантов шаблонного тега
+
+**commit: `lesson_48: добавление второго варианта фильтра (inclusion_tag)`**
