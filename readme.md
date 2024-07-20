@@ -262,3 +262,16 @@ HOTFIX: `templatetags` перенесён в cards из `cards/templates`
 - Создали суперпользователя командой `python manage.py createsuperuser`
 
 **commit: `lesson_49: применили первые миграции и создали админа`**
+
+### Сделали первую модель `Card` и миграции к ней
+
+- Создали миграцию командой `python manage.py makemigrations`
+- Применили миграции командой `python manage.py migrate`
+
+### Знакомство с `Shell Plus` и работа с моделью `Card` в интерактивной оболочке Django
+- Установка `Shell Plus` командой `pip install django-extensions`
+- Добавление `django_extensions` в `INSTALLED_APPS` в файле `settings.py`
+- Запуск `Shell Plus` командой `python manage.py shell_plus` (для отображения SQL запросов в консоли - `python manage.py shell_plus --print-sql`
+- Для того, чтобы начать работать с моделью `Card` в интерактивной оболочке Django, нужно выполнить команду `python manage.py shell_plus`
+
+**commit: `lesson_49: создали первую модель и установили Shell Plus`**
