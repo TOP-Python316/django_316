@@ -15,3 +15,28 @@ class Card(models.Model):
 
     def __str__(self):
         return f'Карточка {self.question} - {self.answer[:50]}'
+
+    """
+    1. Модель - это класс, который наследуется от models.Model
+    2. Поля модели - это атрибуты класса, которые являются экземплярами классов Field
+    3. Вложенный класс Meta - это метаданные модели
+    4. db_table - это имя таблицы в базе данных
+    5. verbose_name - это имя модели в единственном числе
+    6. verbose_name_plural - это имя модели во множественном числе
+    ### CRUD Операции с этой моделью
+    1. Создание записи
+    card = Card(question='Пайтон или Питон?!', answer='Пайтон')
+    card.save()
+    2. Чтение записи
+    card = Card.objects.get(pk=1)
+    Мы можем добыть любые данные из записи, просто обратившись к атрибутам модели:
+    card.question
+    card.answer
+    card.upload_date
+    3. Обновление записи
+    card = Card.objects.get(pk=1)
+    card.question = 'Питон или Пайтон?!!'
+    4. Удаление записи
+    card = Card.objects.get(pk=1)
+    card.delete()
+    """

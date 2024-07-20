@@ -275,3 +275,48 @@ HOTFIX: `templatetags` перенесён в cards из `cards/templates`
 - Для того, чтобы начать работать с моделью `Card` в интерактивной оболочке Django, нужно выполнить команду `python manage.py shell_plus`
 
 **commit: `lesson_49: создали первую модель и установили Shell Plus`**
+
+### CRUD Операции с этой моделью
+1. Создание записи
+card = Card(question='Пайтон или Питон?!', answer='Пайтон')
+card.save()
+
+2. Чтение записи
+card = Card.objects.get(pk=1)
+Мы можем добыть любые данные из записи, просто обратившись к атрибутам модели:
+card.question
+card.answer
+card.upload_date
+
+3. Обновление записи
+card = Card.objects.get(pk=1)
+card.question = 'Питон или Пайтон?!!'
+
+4. Удаление записи
+card = Card.objects.get(pk=1)
+card.delete()
+
+5. Как можно откатить миграции?
+- Целиком для приложения `cards` командой `python manage.py migrate cards zero`
+- Вернуться к конкретной миграции `python manage.py migrate cards 0001_initial`
+
+**commit: `lesson_49: базовые CRUD Операции с моделью Card`**
+
+### Подключение модели `Card` в административной панели
+- Создали файл `admin.py` в приложении `cards` (если его нет)
+- Зарегистрировали модель `Card` в административной панели
+- `settings.py` `LANGUAGE_CODE = 'ru-ru'` - для русского языка в админке
+
+```python
+from django.contrib import admin
+from .models import Card
+
+admin.site.register(Card)
+
+class CardAdmin(admin.ModelAdmin):
+    pass
+```
+
+- создаем суперпользователя если он ещё не был создан `python manage.py createsuperuser`
+
+**commit: `lesson_49: подключили модель Card в административной панели`**
