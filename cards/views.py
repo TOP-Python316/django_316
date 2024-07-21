@@ -109,8 +109,29 @@ def about(request):
 
 def catalog(request):
     """Функция для отображения страницы "Каталог"
-    будет возвращать рендер шаблона /templates/cards/catalog.html"""
-    cards = Card.objects.all()
+    будет возвращать рендер шаблона /templates/cards/catalog.html
+    - **`sort`** - ключ для указания типа сортировки с возможными значениями: `date`, `views`, `adds`.
+    - **`order`** - опциональный ключ для указания направления сортировки с возможными значениями: `asc`, `desc`. По умолчанию `desc`.
+    1. Сортировка по дате добавления в убывающем порядке (по умолчанию): `/cards/catalog/`
+    2. Сортировка по количеству просмотров в убывающем порядке: `/cards/catalog/?sort=views`
+    3. Сортировка по количеству добавлений в возрастающем порядке: `/cards/catalog/?sort=adds&order=asc`
+    4. Сортировка по дате добавления в возрастающем порядке: `/cards/catalog/?sort=date&order=asc`
+    """
+
+    sort = request.GET.get('sort', 'upload_date')  # по умолчанию сортируем по дате загрузки
+    order = request.GET.get('order', 'desc')  # по умолчанию используем убывающий порядок
+
+    valid_sort_fields = {'upload_date', 'views', 'adds'}
+
+    if sort not in valid_sort_fields:
+        sort = 'upload_date'
+
+    if order == 'asc':
+        order_by = sort
+    else:
+        order_by = f'-{sort}'
+
+    cards = Card.objects.all().order_by(order_by)
 
     context = {
         'cards': cards,
