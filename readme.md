@@ -415,3 +415,10 @@ class CardAdmin(admin.ModelAdmin):
 4. Сортировка по дате добавления в возрастающем порядке: `/cards/catalog/?sort=date&order=asc`
 
 **commit: `lesson_50: сделали сортировку для каталога`**
+
+### Lookups
+- Еще раз пробежались по лукапам 
+
+### `get_object_or_404` для детального отображения карточки по ID
+
+**commit: `lesson_50: get_object_or_404 для детального отображения карточки по ID`**

@@ -13,7 +13,7 @@ render(запрос, шаблон, контекст=None)
 """
 
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Card
 
 """
@@ -167,9 +167,10 @@ def get_cards_by_tag(request, slug):
 def get_detail_card_by_id(request, card_id):
     """
     Возвращает детальную информацию по карточке для представления
+    Использует функцию  get_object_or_404 для обработки ошибки 404
     """
     # Ищем карточку по id в нашем наборе данных
-    card = Card.objects.get(pk=card_id)
+    card = get_object_or_404(Card, pk=card_id)
 
     # card.tags = '["php", "perl", "raku"]'  # Проверили что Django ORM преобразует JSON в список
 
