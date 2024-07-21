@@ -394,3 +394,11 @@ class CardAdmin(admin.ModelAdmin):
 ```
 
 **commit: `lesson_50: добавили примеры для настройки отображения админки`**
+
+### Добавили теги в модель `Card`
+- Добавили поле `tags` в модель `Card`
+- Создали миграцию командой `python manage.py makemigrations`
+- Применили миграцию командой `python manage.py migrate`
+- Проверили что Django ORM преобразует JSON в список
+
+**commit: `lesson_50: добавили теги в модель Card`**

@@ -7,6 +7,7 @@ class Card(models.Model):
     upload_date = models.DateTimeField(auto_now_add=True, db_column='upload_date')
     views = models.IntegerField(default=0)
     adds = models.IntegerField(default=0)
+    tags = models.JSONField(default=list)
 
     class Meta:
         db_table = 'Cards'  # имя таблицы в базе данных

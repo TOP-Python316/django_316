@@ -150,6 +150,8 @@ def get_detail_card_by_id(request, card_id):
     # Ищем карточку по id в нашем наборе данных
     card = Card.objects.get(pk=card_id)
 
+    # card.tags = '["php", "perl", "raku"]'  # Проверили что Django ORM преобразует JSON в список
+
     context = {
         'card': card,
         'menu': info['menu']
