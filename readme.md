@@ -351,3 +351,10 @@ for card in Card.objects.all():
 8. Получаем карточки добавленные во вторник `Card.objects.filter(upload_date__week_day=3)`
 
 **commit: `lesson_49: методы объектного менеджера objects`**
+
+
+## Lesson 50
+
+добавили новые маршруты, добавили стили и иконки, добавили адаптивность
+
+**commit: `lesson_50: сделали симпатичную вёрстку`**

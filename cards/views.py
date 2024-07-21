@@ -1,9 +1,15 @@
 """
-get_all_cards - возвращает все карточки для представления в каталоге
+cards/views.py
+index - возвращает главную страницу - шаблон /templates/cards/main.html
+about - возвращает страницу "О проекте" - шаблон /templates/cards/about.html
+catalog - возвращает страницу "Каталог" - шаблон /templates/cards/catalog.html
 get_categories - возвращает все категории для представления в каталоге
 get_cards_by_category - возвращает карточки по категории для представления в каталоге
 get_cards_by_tag - возвращает карточки по тегу для представления в каталоге
 get_detail_card_by_id - возвращает детальную информацию по карточке для представления
+render(запрос, шаблон, контекст=None)
+    Возвращает объект HttpResponse с отрендеренным шаблоном шаблон и контекстом контекст.
+    Если контекст не передан, используется пустой словарь.
 """
 
 from django.http import HttpResponse
@@ -88,28 +94,30 @@ info = {
 }
 
 
-def main(request):
-    """Представление рендерит шаблон main.html"""
-    return render(request, 'main.html', context=info)
+def index(request):
+    """Функция для отображения главной страницы
+    будет возвращать рендер шаблона root/templates/main.html"""
+    return render(request, "main.html", info)
 
 
 def about(request):
-    """Представление рендерит шаблон about.html"""
-    return render(request, 'about.html', context=info)
+    """Функция для отображения страницы "О проекте"
+    будет возвращать рендер шаблона /root/templates/about.html"""
+    return render(request, 'about.html', info)
 
 
-def get_all_cards(request):
-    """
-    Возвращает все карточки для представления в каталоге
-    """
-    return render(request, 'cards/catalog.html', context=info)
+def catalog(request):
+    """Функция для отображения страницы "Каталог"
+    будет возвращать рендер шаблона /templates/cards/catalog.html"""
+    return render(request, 'cards/catalog.html', info)
 
 
 def get_categories(request):
     """
     Возвращает все категории для представления в каталоге
     """
-    return HttpResponse('All categories')
+    # Проверка работы базового шаблона
+    return render(request, 'base.html', info)
 
 
 def get_cards_by_category(request, slug):

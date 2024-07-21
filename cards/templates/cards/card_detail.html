@@ -1,20 +1,32 @@
 {% extends "base.html" %}
-{% load markdown_to_html %}
-{% load markdown_to_html_2 %}
 {% block content %}
-<!-- Детальное представление карточки cards/templates/cards/include/card_preview.html -->
-<div class="card" style="width: 18rem;">
-    <div class="card-body">
-      <h5 class="card-title">{% markdown_to_html2 card.question %}</h5>
-      <p class="card-text"> {% markdown_to_html card.answer %} </p>
-      <p class="card-text">{{ card.category }}</p>
-      <p class="card-text">{{ card.tags }}</p>
-      <p class="card-text">{{ card.id_author }}</p>
-      <p class="card-text">{{ card.id_card }}</p>
-      <p class="card-text">{{ card.upload_date }}</p>
-      <p class="card-text">{{ card.views_count }}</p>
-      <p class="card-text">{{ card.favorites_count }}</p>
-      <a href="{% url 'detail_card_by_id' card.id_card %}" class="btn btn-primary">Подробнее</a>
+  <!-- Детальное представление карточки cards/templates/cards/include/card_preview.html -->
+  <!-- Детальное представление карточки cards/templates/cards/detail_card.html
+   расширяет базовый шаблон base.html -->
+  <div class="container mt-5">
+    <div class="card">
+      <div class="card-header">
+        Детальное представление карточки
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">{{ card.question }}</h5>
+        <p class="card-text">{{ card.answer }}</p>
+        <p class="card-text"><small class="text-muted">Категория: {{ card.category }}</small></p>
+        <p class="card-text">
+          Теги:
+          {% for tag in card.tags %}
+            <span class="badge bg-secondary">{{ tag }}</span>
+          {% endfor %}
+        </p>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <a href="{% url 'catalog' %}" class="btn btn-dark">Вернуться к каталогу</a>
+          <div>
+            <i class="bi bi-eye"></i> {{ card.views_count }}
+            <i class="bi bi-star-fill"></i> {{ card.favorites_count }}
+            <small class="text-muted">Дата загрузки: {{ card.upload_date }}</small>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
-{% endblock content %}
+  </div>
+{% endblock %}
