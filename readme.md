@@ -372,3 +372,25 @@ https://icons.getbootstrap.com/ - иконки для BS5
 - В файлах `card_detail.html`, `card_preview.html` изменили вставку данных просмотров и добавления в избранное на `card.views` и `card.adds` (что соответствует полям views и adds в БД)
 
 **commit: `lesson_50: сделали детальное отображение карточки из БД по ID`**
+
+- добавил примеры для настройки отображения админки в `cards/admin.py`
+сначала задаётся класс, который добавляет модель в админку
+потом этот класс связывается с админкой через `admin.site.register()`
+либо сразу через декоратор `@admin.register(Card)`
+
+1-ый вариант: 
+```python
+class CardAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Card, CardAdmin)
+```
+
+2-ой вариант: 
+```python
+@admin.register(Card)
+class CardAdmin(admin.ModelAdmin):
+    pass
+```
+
+**commit: `lesson_50: добавили примеры для настройки отображения админки`**
