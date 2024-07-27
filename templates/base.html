@@ -33,7 +33,8 @@
     <link rel="stylesheet" href="{% static 'cards/css/main.css' %}" />
     <!-- Подключение иконок Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css" rel="stylesheet">
-
+    <!-- Highlight.js Stylesheet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/gradient-light.min.css">
 
     <!-- Блок для дополнительных настроек в head -->
     {% block head %} {% endblock %}
@@ -69,6 +70,10 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
+
+    <!-- Highlight.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
 
     <script src="{% static 'cards/js/main.js' %}"></script>
 
