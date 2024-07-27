@@ -430,3 +430,49 @@ class CardAdmin(admin.ModelAdmin):
 - сделали счётчик просмотров карточки через F-объект
 
 **commit: `lesson_51: рассмотрели F-объект`**
+
+### Подготовили базу данных anki.db
+```sql
+PRAGMA foreign_keys = 0;
+
+--Создание временной таблицы без столбца UserID
+CREATE TABLE sqlitestudio_temp_table AS SELECT CardID, Question, Answer, CategoryID, UploadDate, Views, Favorites FROM Cards;
+
+--Удаление оригинальной таблицы Cards
+DROP TABLE Cards;
+
+--Создание новой таблицы Cards без столбца UserID
+ CREATE TABLE Cards (
+ CardID INTEGER PRIMARY KEY AUTOINCREMENT,
+ Question TEXT NOT NULL,
+ Answer TEXT NOT NULL,
+ CategoryID INTEGER,
+ UploadDate DATETIME DEFAULT (datetime('now')),
+ Views INTEGER DEFAULT (0),
+ Favorites INTEGER DEFAULT (0),
+ FOREIGN KEY (CategoryID) REFERENCES Categories (CategoryID) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+--Удаление временной таблицы
+DROP TABLE sqlitestudio_temp_table;
+
+--Копирование данных обратно в Cards из временной таблицы
+INSERT INTO Cards (CardID, Question, Answer, CategoryID, UploadDate, Views, Favorites)
+SELECT CardID, Question, Answer, CategoryID, UploadDate, Views, Favorites FROM sqlitestudio_temp_table;
+
+PRAGMA foreign_keys = 1;
+```
+
+### написали новые модели
+- описали модель Tag
+- описали модель CardTag
+- описали модель Category
+- переписали модель Card
+
+### сделали миграцию
+- старые миграции удалены
+- заново применены 18 базовых миграций
+- сделана фейковая миграция `python manage.py migrate --fake` для того чтобы 
+Django "думал", что он сам создал наши новые таблицы
+
+**commit: `lesson_51: подключили базу данных anki.db`**

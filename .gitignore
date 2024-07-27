@@ -2,4 +2,5 @@ venv
 .idea
 .vscode
 db.sqlite3
+anki.db
 __pycache__
