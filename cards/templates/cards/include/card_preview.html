@@ -15,7 +15,9 @@
         <p class="card-text">
           Теги:
           {% for tag in card.tags.all %}
-            <span class="badge bg-secondary">{{ tag.name }}</span>
+            <span class="badge bg-secondary">
+              <a href="{% url 'get_cards_by_tag' tag_id=tag.pk %}" class="text-white">{{ tag.name }}</a>
+            </span>
           {% endfor %}
         </p>
         <div class="d-flex justify-content-between align-items-center mt-2">
