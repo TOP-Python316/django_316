@@ -37,7 +37,7 @@ class CardTag(models.Model):
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE, db_column='TagID')
 
     class Meta:
-        db_table = 'CardsTags'
+        db_table = 'CardTags'
         verbose_name = 'Тег карточки'
         verbose_name_plural = 'Теги карточек'
 

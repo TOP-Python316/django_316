@@ -14,8 +14,8 @@
         <p class="card-text"><small class="text-muted">Категория: {{ card.category }}</small></p>
         <p class="card-text">
           Теги:
-          {% for tag in card.tags %}
-            <span class="badge bg-secondary">{{ tag }}</span>
+          {% for tag in card.tags.all %}
+            <span class="badge bg-secondary">{{ tag.name }}</span>
           {% endfor %}
         </p>
         <div class="d-flex justify-content-between align-items-center mt-3">
