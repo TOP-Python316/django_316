@@ -12,6 +12,7 @@ render(запрос, шаблон, контекст=None)
     Если контекст не передан, используется пустой словарь.
 """
 
+from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from .models import Card
@@ -171,6 +172,13 @@ def get_detail_card_by_id(request, card_id):
     """
     # Ищем карточку по id в нашем наборе данных
     card = get_object_or_404(Card, pk=card_id)
+
+    # обновляем счётчика просмотров карточки через F-объект
+    card.views = F('views') + 1
+    card.save()
+
+    # обновляем данные из БД
+    card.refresh_from_db()
 
     # card.tags = '["php", "perl", "raku"]'  # Проверили что Django ORM преобразует JSON в список
 
