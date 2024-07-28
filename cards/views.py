@@ -132,11 +132,14 @@ def catalog(request):
     else:
         order_by = f'-{sort}'
 
-    cards = Card.objects.all().order_by(order_by)
+    # cards = Card.objects.all().order_by(order_by)
+
+    # Получаем карточки из БД в ЖАДНОМ режиме
+    cards = Card.objects.prefetch_related('tags').order_by(order_by)
 
     context = {
         'cards': cards,
-        'cards_count': cards.count(),
+        'cards_count': len(cards),
         'menu': info['menu'],
     }
 
