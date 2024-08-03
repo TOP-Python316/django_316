@@ -19,6 +19,9 @@ class Card(models.Model):
     def __str__(self):
         return f'Карточка {self.question} - {self.answer[:50]}'
 
+    def get_absolute_url(self):
+        return f'/cards/{self.id}/detail/'
+
 
 class Tag(models.Model):
     id = models.AutoField(primary_key=True, db_column='TagID')
