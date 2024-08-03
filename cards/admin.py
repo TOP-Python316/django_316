@@ -4,10 +4,14 @@ from .models import Card
 
 @admin.register(Card)
 class CardAdmin(admin.ModelAdmin):
-    # list_display = ('id', 'question', 'answer', 'upload_date', 'views', 'adds')
-    # list_filter = ('upload_date', 'views')
-    # fields = ['question', 'answer', ('views', 'adds')]
-    pass
+    # поля, которые будут отображаться в админке
+    list_display = ('question', 'category', 'views', 'upload_date',)
+    # поля, которые будут ссылками
+    list_display_links = ('question', 'upload_date',)
+    # поля, по которым можно проводить поиск
+    search_fields = ('answer',)  # не забываем поставить запятую в конце, если у нас только одно значение, чтобы показать Python, что это кортеж
+    # поля, по которым мы можем проводить фильтрацию
+    list_filter = ('category',)
 
 
 # сначала задаётся класс, который добавляет модель в админку

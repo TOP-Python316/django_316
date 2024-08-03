@@ -5,6 +5,7 @@ class Card(models.Model):
     id = models.AutoField(primary_key=True, db_column='CardID')
     question = models.CharField(max_length=255, db_column='Question')
     answer = models.TextField(max_length=5000, db_column='Answer')
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, db_column='CategoryID')
     upload_date = models.DateTimeField(auto_now_add=True, db_column='UploadDate')
     views = models.IntegerField(default=0, db_column='Views')
     adds = models.IntegerField(default=0, db_column='Favorites')
