@@ -3,6 +3,10 @@ from django.urls import path, include
 from anki import settings
 from cards import views
 
+admin.site.site_header = 'Управление сайтом ANKI'  # текст в шапке админ. панели
+admin.site.site_title = 'Админ. панель для ANKI'  # текст в тайтле админ. панели
+admin.site.index_title = 'Добро пожаловать в панель управления!'  # текст на главной странице админ. панели
+
 
 # Подключаем файл urls.py из приложения cards через include
 urlpatterns = [
