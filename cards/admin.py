@@ -1,6 +1,23 @@
 from django.contrib import admin
 from .models import Card
+from django.contrib.admin import SimpleListFilter
 
+
+class CardCodeFilter(SimpleListFilter):
+    title = 'Наличие кода'
+    parameter_name = 'has_code'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Да'),
+            ('no', 'Нет')
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            return queryset.filter(answer__contains='```')
+        elif self.value() == 'no':
+            return queryset.exclude(answer__contains='```')
 
 @admin.register(Card)
 class CardAdmin(admin.ModelAdmin):
@@ -11,7 +28,7 @@ class CardAdmin(admin.ModelAdmin):
     # поля, по которым можно проводить поиск
     search_fields = ('answer',)  # не забываем поставить запятую в конце, если у нас только одно значение, чтобы показать Python, что это кортеж
     # поля, по которым мы можем проводить фильтрацию
-    list_filter = ('category', 'status')
+    list_filter = ('category', 'status', CardCodeFilter)
     # сортировка по полям
     ordering = ('-views', 'category')
     # изменение выводимого количества элементов на страницу
@@ -29,7 +46,7 @@ class CardAdmin(admin.ModelAdmin):
     @admin.action(description='Пометить как непроверенные')
     def set_unchecked(self, request, queryset):
         updated_count = queryset.update(status=Card.Status.UNCHECKED)
-        self.message_user(request, f'{updated_count} записей было помечено как непроверенные')
+        self.message_user(request, f'{updated_count} записей было помечено как непроверенные', 'warning')
 
     # определение метода для отображения краткой информации в карточке
     @admin.display(description='Наличие кода', ordering='answer')
