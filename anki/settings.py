@@ -35,17 +35,18 @@ INTERNAL_IPS = [
 # Application definition
 
 INSTALLED_APPS = [
-    # приложения по умолчанию
+    'jazzmin',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # сторонние приложения
+
     'django_extensions',
     'debug_toolbar',
-    # наши приложения
+
     'cards'
 ]
 
