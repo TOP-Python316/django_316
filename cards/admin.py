@@ -35,8 +35,8 @@ class CardAdmin(admin.ModelAdmin):
     list_per_page = 12
     # поля, которые можно редактировать напрямую
     list_editable = ('views', 'question', 'status')
-
     actions = ['set_checked', 'set_unchecked']
+    change_form_template = 'admin/cards/change_form_custom.html'
 
     @admin.action(description='Пометить как проверенные')
     def set_checked(self, request, queryset):

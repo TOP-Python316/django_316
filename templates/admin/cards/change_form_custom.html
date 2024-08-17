@@ -1,0 +1,19 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static %}
+
+{% block object-tools-items %}
+<li>
+    <a href="{% url 'detail_card_by_id' original.pk %}" class="viewlink" target="_blank">{% trans "Предварительный просмотр" %}</a>
+</li>
+{{ block.super }}
+{% endblock %}
+
+{% block after_field_sets %}
+<!-- Ваш кастомный контейнер для предварительного просмотра -->
+<div id="preview-container">
+    <!-- Контент предварительного просмотра -->
+    ЭТО КОНТЕНТ ПРЕДВАРИТЕЛЬНОГО ПРОСМОТРА
+</div>
+{{ block.super }}
+
+{% endblock %}
