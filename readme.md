@@ -720,3 +720,12 @@ _нам нужно было ограничить значения поля `stat
 - добавили JS-код в `change_form_custom.html` для загрузки предпросмотра карточки
 
 **commit: `lesson_55: добавили обновление предпросмотра карточки в админке в реальном времени`**
+
+- Удалить файл с БД `anki.db`
+- Применить инициирующие миграции, которые создадут системные таблицы `python manage.py migrate`
+- Создать админа `python manage.py createsuperuser`
+- Создать миграции по структурам прописанным в БД `python manage.py makemigrations`
+- Применить миграцию, созданную в предыдущем шаге `python manage.py migrate`
+- Залить данные из `dump.json` в новую БД `python manage.py loaddata dump.json`
+
+**commit: `lesson_55: загрузили содержимое БД из дампа`**
