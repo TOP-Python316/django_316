@@ -1,19 +1,111 @@
 {% extends "admin/change_form.html" %}
 {% load i18n admin_urls static %}
 
-{% block object-tools-items %}
-<li>
-    <a href="{% url 'detail_card_by_id' original.pk %}" class="viewlink" target="_blank">{% trans "Предварительный просмотр" %}</a>
-</li>
-{{ block.super }}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Колонка для формы редактирования -->
+        <div class="col-12 col-lg-6">
+            {{ block.super }}
+        </div>
+
+        <!-- Колонка для предварительного просмотра -->
+        <div class="col-12 col-lg-6">
+            <div id="preview-container" class="shadow-lg p-3 mb-5 bg-white rounded">
+                <!-- Сюда будет вставлен предварительный просмотр -->
+                ЭТО КОНТЕНТ ПРЕДВАРИТЕЛЬНОГО ПРОСМОТРА
+            </div>
+        </div>
+
+
+    </div>
+</div>
 {% endblock %}
 
-{% block after_field_sets %}
-<!-- Ваш кастомный контейнер для предварительного просмотра -->
-<div id="preview-container">
-    <!-- Контент предварительного просмотра -->
-    ЭТО КОНТЕНТ ПРЕДВАРИТЕЛЬНОГО ПРОСМОТРА
-</div>
-{{ block.super }}
+{% comment %} {% block extrastyle %}
+<!-- Highlight.js Stylesheet -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/tomorrow-night-bright.min.css">
+{% endblock %} {% endcomment %}
+
+{% block extrahead %}
+<!-- Подключение библиотеки Highlight.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
+<script>
+// Вывод в консоль чтобы убедиться, что скрипт запущен
+console.log('preview_card_ajax.js');
+
+// Получение токена CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+    // Основной код, выполняющийся после загрузки DOM
+    // Инициализирует переменные для полей ввода вопроса, ответа и предварительного просмотра
+    document.addEventListener('DOMContentLoaded', () => {
+
+    const questionInput = document.querySelector('#id_question'); // ID поля вопроса в вашей форме
+    const answerInput = document.querySelector('#id_answer'); // ID поля ответа
+    const previewContainer = document.querySelector('#preview-container'); // Контейнер для вставки предварительного просмотра
+    const csrftoken = getCookie('csrftoken'); // Получение токена CSRF
+    let timeout = null;
+
+    console.log(`csrftoken: ${csrftoken}`)
+
+    // функция для получения предварительного просмотра
+    // функция отправляет POST-запрос на сервер с данными из полей ввода вопроса и ответа
+    // В случае успешного ответа, она обновляет содержимое контейнера предварительного просмотра и применяется подсветка синтаксиса
+    const fetchPreview = async () => {
+        const formData = new FormData();
+        formData.append('question', questionInput.value);
+        formData.append('answer', answerInput.value);
+
+        try {
+            console.log('fetching preview...');
+            const response = await fetch('/cards/preview_card_ajax/', { // Укажите правильный URL
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrftoken, // csrftoken необходимо определить
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            previewContainer.innerHTML = data.html;
+            console.log(hljs)
+            setTimeout(() => hljs.highlightAll(), 100); // небольшая задержка может помочь
+
+        } catch (error) {
+            console.error('Failed to fetch preview:', error);
+        }
+    };
+
+    // Задержка вызова функции fetchPreview на 2 секунды, для того чтобы не было слишком частых запросов сервера при быстром вводе данных
+    const debounceFetchPreview = () => {
+        clearTimeout(timeout);
+        console.log('debouncing...');
+        timeout = setTimeout(fetchPreview, 2000);
+    };
+
+    // Добавление обработчиков событий, для того чтобы вызывать debounceFetchPreview при каждом вводе данных
+    questionInput.addEventListener('input', debounceFetchPreview);
+    answerInput.addEventListener('input', debounceFetchPreview);
+});
+
+</script>
 
 {% endblock %}

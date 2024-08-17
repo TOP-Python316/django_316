@@ -13,8 +13,9 @@ render(запрос, шаблон, контекст=None)
 """
 
 from django.db.models import F
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
 from .models import Card
 from django.views.decorators.cache import cache_page
 
@@ -202,3 +203,24 @@ def get_detail_card_by_id(request, card_id):
     }
 
     return render(request, 'cards/card_detail.html', context)
+
+
+def preview_card_ajax(request):
+    if request.method == "POST":
+        question = request.POST.get('question', '')
+        answer = request.POST.get('answer', '')
+        category = request.POST.get('category', '')
+
+        # Генерация HTML для предварительного просмотра
+        html_content = render_to_string('cards/card_detail.html', {
+            'card': {
+                'question': question,
+                'answer': answer,
+                'category': 'Тестовая категория',
+                'tags': ['тест', 'тег'],
+
+            }
+        }
+                                        )
+        return JsonResponse({'html': html_content})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
