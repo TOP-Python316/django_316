@@ -12,4 +12,5 @@ urlpatterns = [
     path('tags/<int:tag_id>/', views.get_cards_by_tag, name='get_cards_by_tag'),  # Карточки по тегу
     path('<int:card_id>/detail/', views.get_detail_card_by_id, name='detail_card_by_id'),  # Детальная информация по карточке
     path('preview_card_ajax/', views.preview_card_ajax, name='preview_card_ajax'),
+    path('add/', views.add_card, name='add_card')
 ]

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+{% load markdown_to_html %}
+
+    <h1>Добавить карточку</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Добавить</button>
+    </form>
+
+{% endblock %}
