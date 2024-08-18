@@ -79,7 +79,7 @@ def catalog(request):
     # cards = Card.objects.all().order_by(order_by)
 
     # Получаем карточки из БД в ЖАДНОМ режиме
-    cards = Card.objects.prefetch_related('tags').order_by(order_by)
+    cards = Card.objects.select_related('category').prefetch_related('tags').order_by(order_by)
 
     context = {
         'cards': cards,
