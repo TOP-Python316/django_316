@@ -108,13 +108,23 @@ class CardForm(forms.ModelForm):
         return tag_list
 
     def save(self, *args, **kwargs):
-        # сохранение карточки с тегами
+        # Мы получаем экземпляр карточки. Без commit=False карточка сохранится в базу данных
+        # При попытке сохранения, необработанные теги приведут к ошибке
+        # В этом режиме мы получаем только экземпляр карточки.
         instance = super().save(commit=False)
-        instance.save()  # сначала сохраняем карточку чтобы получить её id
+        # Сохраняем карточку в базу данных, чтобы у нее появился id
+        # Без id мы не сможем добавить теги
+        instance.save()
 
         # Обрабатываем теги
         for tag_name in self.cleaned_data['tags']:
             tag, created = Tag.objects.get_or_create(name=tag_name)
+            # На каждой итерации пополняется таблица много-ко-многим
             instance.tags.add(tag)
 
         return instance
+
+
+class UploadFileForm(forms.Form):
+    # Здесь определяется поле для загрузки файла
+    file = forms.FileField(label='Выберите файл', widget=forms.FileInput(attrs={'class': 'form-control'}))

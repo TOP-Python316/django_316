@@ -19,7 +19,9 @@ from django.template.loader import render_to_string
 from .models import Card
 from django.views.decorators.cache import cache_page
 from django.http import HttpResponseRedirect
-from .forms import CardForm
+from .forms import CardForm, UploadFileForm
+
+import os
 
 info = {
     "users_count": 100500,
@@ -183,3 +185,34 @@ def add_card(request):
         'menu': info['menu']
     }
     return render(request, 'cards/add_card.html', context)
+
+
+def handle_uploaded_file(f):
+    # Создаем путь к файлу в директории uploads, имя файла берем из объекта f
+    file_path = f'uploads/{f.name}'
+
+    # Создаем папку uploads, если ее нет
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+
+    # Открываем файл для записи в бинарном режиме (wb+)
+    with open(file_path, "wb+") as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+
+    return file_path
+
+
+def add_card_by_file(request):
+    if request.method == 'POST':
+
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Записываем файл на диск
+            file_path = handle_uploaded_file(request.FILES['file'])
+
+            # Редирект на страницу каталога после успешного сохранения
+            return redirect('catalog')
+    else:
+        form = UploadFileForm()
+    return render(request, 'cards/add_file_card.html', {'form': form})
