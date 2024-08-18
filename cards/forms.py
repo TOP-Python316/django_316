@@ -1,7 +1,7 @@
 # cards/forms.py
 
 from django import forms
-from .models import Category
+from .models import Category, Card, Tag
 from django.core.exceptions import ValidationError
 import re
 
@@ -60,22 +60,61 @@ class CodeBlockValidator:
             raise ValidationError("Уберите пробел перед закрывающими ```.")
 
 
-class CardForm(forms.Form):
-    question = forms.CharField(
-        label='Вопрос',
-        max_length=100,
-        widget=forms.TextInput(attrs={"class": "form-control"}),
-    )
+class TagStringValidator:
+    def __call__(self, value):
+        if ' ' in value:
+            raise ValidationError('Теги не должны содержать пробелов')
+
+class CardForm(forms.ModelForm):
+
+    # в этих блоках можно определять только поля, которые мы хотим кастомизировать
     answer = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'cols': 40}),
         label='Ответ',
-        widget=forms.Textarea(attrs={"class": "form-control", "rows": 5, "cols": 40}),
-        max_length=5000,
         validators=[CodeBlockValidator()]
     )
     category = forms.ModelChoiceField(
         queryset=Category.objects.all(),
         label='Категория',
-        empty_label='Выберите категорию',
-        widget=forms.Select(attrs={"class": "form-control"}),
-        error_messages={'required': 'Это поле обязательно для заполнения'},
+        empty_label='Категория не выбрана',
+        widget=forms.Select(attrs={'class': 'form-control'}),
     )
+    tags = forms.CharField(
+        label='Теги',
+        required=False,
+        help_text='Перечислите теги через запятую, без пробелов',
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        validators=[TagStringValidator()]
+    )
+
+    class Meta:
+        model = Card  # модель с которой работаем форма
+        fields = ['question', 'answer', 'category', 'tags']  # поля, которые будут в форме и их порядок
+
+        # Виджеты для полей
+        widgets =  {
+            'question': forms.TextInput(attrs={'class': 'form-control'})
+        }
+
+        # Метки для полей
+        labels = {
+            'question': 'Вопрос',
+        }
+
+    def clean_tags(self):
+        # преобразование строки тегов в список тегов
+        tags_str = self.cleaned_data['tags'].lower()
+        tag_list = [tag.strip() for tag in tags_str.split(',') if tag.strip()]
+        return tag_list
+
+    def save(self, *args, **kwargs):
+        # сохранение карточки с тегами
+        instance = super().save(commit=False)
+        instance.save()  # сначала сохраняем карточку чтобы получить её id
+
+        # Обрабатываем теги
+        for tag_name in self.cleaned_data['tags']:
+            tag, created = Tag.objects.get_or_create(name=tag_name)
+            instance.tags.add(tag)
+
+        return instance

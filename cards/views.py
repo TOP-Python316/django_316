@@ -14,7 +14,7 @@ render(запрос, шаблон, контекст=None)
 
 from django.db.models import F
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from .models import Card
 from django.views.decorators.cache import cache_page
@@ -171,18 +171,10 @@ def add_card(request):
     if request.method == 'POST':
         form = CardForm(request.POST)
         if form.is_valid():
-            question = form.cleaned_data['question']
-            answer = form.cleaned_data['answer']
-            category = form.cleaned_data.get('category', None)
-
-            # Сохраняем карточку в БД
-            card = Card(question=question, answer=answer, category=category)
-            card.save()
-            # Получаем id созданной карточки
-            card_id = card.id
+            card = form.save()
 
             # Перенаправляем на страницу с детальной информацией о карточке
-            return HttpResponseRedirect(f'/cards/{card_id}/detail/')
+            return redirect(card.get_absolute_url())
     else:
         form = CardForm()
 
