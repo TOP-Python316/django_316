@@ -21,6 +21,7 @@ from django.views.decorators.cache import cache_page
 from django.http import HttpResponseRedirect
 from .forms import CardForm, UploadFileForm
 from django.core.paginator import Paginator
+from django.views import View
 
 import os
 
@@ -220,22 +221,26 @@ def preview_card_ajax(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-def add_card(request):
-    if request.method == 'POST':
+class AddCardView(View):
+    def get(self, request):
+        """Обработка GET-запроса формы добавления карточки
+        """
+
+        form = CardForm()
+        return render(request, 'cards/add_card.html', {'form': form})
+
+    def post(self, request):
+        """Обработка POST-запроса формы добавления карточки
+        если форма валидна, то добавляем карточку в БД
+        иначе отображаем форму с ошибками
+        """
+
         form = CardForm(request.POST)
         if form.is_valid():
             card = form.save()
-
-            # Перенаправляем на страницу с детальной информацией о карточке
             return redirect(card.get_absolute_url())
-    else:
-        form = CardForm()
-
-    context = {
-        'form': form,
-        'menu': info['menu']
-    }
-    return render(request, 'cards/add_card.html', context)
+        
+        return render(request, 'cards/add_card.html', {'form': form})
 
 
 def handle_uploaded_file(f):
