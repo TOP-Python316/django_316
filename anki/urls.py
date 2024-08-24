@@ -13,8 +13,8 @@ urlpatterns = [
     # Админка
     path('admin/', admin.site.urls),
     # Маршруты для меню
-    path('', views.index, name='index'),
-    path('about/', views.about, name='about'),
+    path('', views.IndexView.as_view(), name='index'),
+    path('about/', views.AboutView.as_view(), name='about'),
     # Маршруты подключенные из приложения cards
     path('cards/', include('cards.urls')),
 ]
