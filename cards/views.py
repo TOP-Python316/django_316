@@ -20,6 +20,7 @@ from .models import Card
 from django.views.decorators.cache import cache_page
 from django.http import HttpResponseRedirect
 from .forms import CardForm, UploadFileForm
+from django.core.paginator import Paginator
 
 import os
 
@@ -68,7 +69,7 @@ def catalog(request):
     sort = request.GET.get('sort', 'upload_date')  # по умолчанию сортируем по дате загрузки
     order = request.GET.get('order', 'desc')  # по умолчанию используем убывающий порядок
     search_query = request.GET.get('search_query', '')  # поиск по карточкам
-    page_number = None
+    page_number = request.GET.get('page', 1)
 
     valid_sort_fields = {'upload_date', 'views', 'adds'}
 
@@ -122,11 +123,19 @@ def catalog(request):
             order_by(order_by).\
             distinct()
 
+    # Создаём объект пагинатора и устанаваливаем кол-во карточек на странице
+    paginator = Paginator(cards, 25)
+
+    # Получаем объект страницы
+    page_obj = paginator.get_page(page_number)
 
     context = {
         'cards': cards,
         'cards_count': len(cards),
         'menu': info['menu'],
+        'page_obj': page_obj,
+        'sort': sort,
+        'order': order,
     }
 
     response = render(request, 'cards/catalog.html', context)

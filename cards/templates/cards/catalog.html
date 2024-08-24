@@ -1,14 +1,63 @@
 <!-- cards/templates/cards/catalog.html -->
 <!-- Использует шаблон cards/templates/cards/include/card_preview.html -->
 {% extends "base.html" %}
+
+{% block head %}
+<style>
+/* Стили для темной темы пагинации */
+.pagination-dark .page-link {
+  background-color: #343a40; /* Темный фон для ссылок */
+  color: #ffffff; /* Белый текст */
+}
+.pagination-dark .page-link:hover {
+  background-color: #495057; /* Светлее при наведении */
+}
+.pagination-dark .page-item.active .page-link {
+  background-color: #212529 !important; /* Очень темный фон для активной ссылки */
+  border-color: #212529 !important; /* Очень темный бордюр для активной ссылки */
+}
+.pagination-dark .page-item.active .page-link:hover {
+  background-color: #32383e !important; /* Немного светлее цвет фона при наведении */
+  border-color: #32383e !important; /* Цвет границы при наведении */
+}
+/* Стили для радиокнопок */
+.form-check-input:checked {
+  background-color: #212529 !important; /* Очень темный фон для активной радиокнопки */
+  border-color: #212529 !important; /* Очень темный бордюр для активной радиокнопки */
+}
+</style>
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
     <h1 class="mt-2 h1">Каталог карточек</h1>
     <div class="row">
         <div class="col-12">
+            <nav aria-label="Page navigation" class="text-dark">
+                <ul class="pagination pagination-dark">
+                  {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link text-white bg-secondary" href="?page={{ page_obj.previous_page_number }}&sort={{ sort }}&order={{ order }}">Предыдущая</a></li>
+                  {% endif %}
+                  
+                  {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link text-white bg-secondary" href="?page={{ num }}&sort={{ sort }}&order={{ order }}">{{ num }}</a>
+                    </li>
+                  {% endfor %}
 
+                  {% if page_obj.has_next %}
+                    <li class="page-item">
+                      <a class="page-link text-white bg-secondary" href="?page={{ page_obj.next_page_number }}&sort={{ sort }}&order={{ order }}">Следующая</a>
+                    </li>
+                  {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
 <!-- В начале шаблона catalog.html, после <h1> -->
+<div class="row">
+    <div class="col-12">
     <form action="{% url 'catalog' %}" method="get" class="mb-5 mt-3">
         <div class="input-group mb-3">
           <input type="text" class="form-control" placeholder="Поиск по карточкам" name="search_query" aria-label="Поиск по карточкам">
