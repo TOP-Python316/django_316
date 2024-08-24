@@ -23,6 +23,7 @@ from .forms import CardForm, UploadFileForm
 from django.core.paginator import Paginator
 from django.views import View
 from django.views.generic import TemplateView
+from django.contrib.auth import get_user_model
 
 import os
 
@@ -57,18 +58,21 @@ class MenuMixin:
         return context
 
 
-class AboutView(TemplateView):
+class AboutView(MenuMixin, TemplateView):
     template_name = "about.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['menu'] = info['menu']
-        return context
+    extra_context = {
+        'cards_count': Card.objects.count(),
+        'users_count': get_user_model().objects.count()
+    }
 
 
 class IndexView(MenuMixin, TemplateView):
     template_name = "main.html"
-    
+
+    extra_context = {
+        'users_count': get_user_model().objects.count()
+    }
+
 
 # @cache_page(60 * 15)
 def catalog(request):
