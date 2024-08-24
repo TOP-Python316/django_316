@@ -12,7 +12,7 @@ render(запрос, шаблон, контекст=None)
     Если контекст не передан, используется пустой словарь.
 """
 
-from django.db.models import F
+from django.db.models import F, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
@@ -53,7 +53,7 @@ def about(request):
     return render(request, 'about.html', info)
 
 
-@cache_page(60 * 15)
+# @cache_page(60 * 15)
 def catalog(request):
     """Функция для отображения страницы "Каталог"
     будет возвращать рендер шаблона /templates/cards/catalog.html
@@ -67,6 +67,8 @@ def catalog(request):
 
     sort = request.GET.get('sort', 'upload_date')  # по умолчанию сортируем по дате загрузки
     order = request.GET.get('order', 'desc')  # по умолчанию используем убывающий порядок
+    search_query = request.GET.get('search_query', '')  # поиск по карточкам
+    page_number = None
 
     valid_sort_fields = {'upload_date', 'views', 'adds'}
 
@@ -78,10 +80,48 @@ def catalog(request):
     else:
         order_by = f'-{sort}'
 
-    # cards = Card.objects.all().order_by(order_by)
+    if not search_query:
+        # Получаем карточки из БД в ЖАДНОМ режиме
+        cards = Card.objects.select_related('category').prefetch_related('tags').order_by(order_by)
+    else:
+        # Пробуем получить карточки по поиску в ЛЕНИВОМ режиме
+        # cards = Card.objects.filter(question__icontains=search_query).order_by(order_by)
 
-    # Получаем карточки из БД в ЖАДНОМ режиме
-    cards = Card.objects.select_related('category').prefetch_related('tags').order_by(order_by)
+        # Пробуем получить карточки по поиску в ЖАДНОМ режиме
+        # cards = Card.objects.\
+        #     filter(question__icontains=search_query).\
+        #     select_related('category').\
+        #     prefetch_related('tags').\
+        #     order_by(order_by)
+
+        # Пробуем получить карточки по поиску в ВОПРОСЕ или в ОТВЕТЕ
+        # cards = Card.objects.\
+        #     filter(Q(question__icontains=search_query) | Q(answer__icontains=search_query)).\
+        #     select_related('category').\
+        #     prefetch_related('tags').\
+        #     order_by(order_by)
+
+        # Пробуем получить карточки по поиску в ВОПРОСЕ или в ОТВЕТЕ или в ТЕГАХ
+        # cards = Card.objects.\
+        #     filter(
+        #         Q(question__icontains=search_query) |
+        #         Q(answer__icontains=search_query) |
+        #         Q(tags__name__icontains=search_query)).\
+        #     select_related('category').\
+        #     prefetch_related('tags').\
+        #     order_by(order_by)
+
+        # Карточка повторяется столько раз сколько у неё есть тегов, для того чтобы избавиться от этого нужно использовать .distinct()
+        # cards = Card.objects.filter(Q(question__icontains=search_query) | Q(answer__icontains=search_query) | Q(tags__name__icontains=search_query)).select_related('category').prefetch_related('tags').order_by(order_by).distinct()
+        cards = Card.objects.filter(
+                Q(question__icontains=search_query) |
+                Q(answer__icontains=search_query) |
+                Q(tags__name__icontains=search_query)).\
+            select_related('category').\
+            prefetch_related('tags').\
+            order_by(order_by).\
+            distinct()
+
 
     context = {
         'cards': cards,
@@ -89,8 +129,10 @@ def catalog(request):
         'menu': info['menu'],
     }
 
-    return render(request, 'cards/catalog.html', context)
-
+    response = render(request, 'cards/catalog.html', context)
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'  # - кэш не используется
+    response['Expires'] = '0'  # Перестраховка - устаревание кэша
+    return response
 
 def get_categories(request):
     """

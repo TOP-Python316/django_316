@@ -1,12 +1,73 @@
 <!-- cards/templates/cards/catalog.html -->
 <!-- Использует шаблон cards/templates/cards/include/card_preview.html -->
 {% extends "base.html" %}
-
 {% block content %}
-    <h1>Каталог карточек Anki для интервального повторения</h1>
-    <p>Здесь вы можете выбрать карточки для изучения</p>
-    <p>На текущий момент, у нас карточек: {{cards_count}} и пользователей: {{users_count}} </p>
-    {% for card in cards %}
-        {% include "cards/include/card_preview.html" %}
-    {% endfor %}
+
+<div class="container">
+    <h1 class="mt-2 h1">Каталог карточек</h1>
+    <div class="row">
+        <div class="col-12">
+
+<!-- В начале шаблона catalog.html, после <h1> -->
+    <form action="{% url 'catalog' %}" method="get" class="mb-5 mt-3">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Поиск по карточкам" name="search_query" aria-label="Поиск по карточкам">
+          <button class="btn btn-dark" type="submit">Поиск</button>
+        </div>
+
+        <!-- Радиокнопки для сортировки -->
+        <div class="mb-1 d-flex justify-content-start">
+          <div><strong>Сортировать по:</strong></div>
+          <div class="form-check ms-2">
+            <input class="form-check-input" type="radio" name="sort" id="sortUploadDate" value="upload_date" checked>
+            <label class="form-check-label" for="sortUploadDate">
+              Дате загрузки
+            </label>
+          </div>
+          <div class="form-check ms-2">
+            <input class="form-check-input" type="radio" name="sort" id="sortViews" value="views">
+            <label class="form-check-label" for="sortViews">
+              Просмотрам
+            </label>
+          </div>
+          <div class="form-check ms-2">
+            <input class="form-check-input" type="radio" name="sort" id="sortFavorites" value="favorites">
+            <label class="form-check-label" for="sortFavorites">
+              Избранному
+            </label>
+          </div>
+        </div>
+        <!-- Радиокнопки для выбора направления сортировки
+          order: порядок сортировки ('asc' для возрастания, 'desc' для убывания; по умолчанию 'desc'). -->
+
+          <div class="mb-1 d-flex justify-content-start">
+            <div><strong>Порядок сортировки:</strong></div>
+            <div class="form-check ms-2">
+              <input class="form-check-input" type="radio" name="order" id="sortOrderDesc" value="desc" checked>
+              <label class="form-check-label" for="sortUploadDate">
+                Убыванию
+              </label>
+            </div>
+            <div class="form-check ms-2">
+              <input class="form-check-input" type="radio" name="order" id="sortOrderAsc" value="asc">
+              <label class="form-check-label" for="sortViews">
+                Возрастанию
+              </label>
+            </div>
+      </form>
+
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+
+
+<p>Здесь вы можете выбрать карточки для изучения</p>
+<p>На текущий момент, у нас карточек: {{cards_count}} и пользователей: {{users_count}} </p>
+{% for card in cards %}
+    {% include "cards/include/card_preview.html" %}
+{% endfor %}
+</div>
+</div>
+</div>
 {% endblock %}
