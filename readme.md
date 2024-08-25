@@ -825,3 +825,9 @@ _нам нужно было ограничить значения поля `stat
 - Использовали переменные для кеша, которые позволяют кешировать разные варианты страницы (по запросам и сортировкам)`{% cache 90 catalog_content page_obj.number sort order search_query %}`
 
 **commit: `lesson_58: доработка каталога и кеширование`**
+
+### DetailView
+- Переписали представление `get_detail_card_by_id` на классовое представление `DetailView`
+- Обновили шаблон `card_detail.html` для работы с классовым представлением
+
+**commit: `lesson_58: get_detail_card_by_id на классовое представление DetailView`**

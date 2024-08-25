@@ -13,6 +13,8 @@ render(запрос, шаблон, контекст=None)
 """
 
 from django.db.models import F, Q
+from django.db.models.base import Model as Model
+from django.db.models.query import QuerySet
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
@@ -22,7 +24,7 @@ from .forms import CardForm, UploadFileForm
 from django.core.paginator import Paginator
 from django.views import View
 from django.views.generic.list import ListView
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DetailView
 from django.contrib.auth import get_user_model
 
 import os
@@ -149,29 +151,18 @@ def get_cards_by_tag(request, tag_id):
     return render(request, 'cards/catalog.html', context)
 
 
-def get_detail_card_by_id(request, card_id):
-    """
-    Возвращает детальную информацию по карточке для представления
-    Использует функцию  get_object_or_404 для обработки ошибки 404
-    """
-    # Ищем карточку по id в нашем наборе данных
-    card = get_object_or_404(Card, pk=card_id)
+class CardDetailView(MenuMixin, DetailView):
+    model = Card  # Указываем, что моделью для этого представления является Card
+    template_name = 'cards/card_detail.html'  # Указываем путь к шаблону для детального отображения карточки
+    context_object_name = 'card'  # Переопределяем имя переменной в контексте шаблона на 'card'
 
-    # обновляем счётчика просмотров карточки через F-объект
-    card.views = F('views') + 1
-    card.save()
-
-    # обновляем данные из БД
-    card.refresh_from_db()
-
-    # card.tags = '["php", "perl", "raku"]'  # Проверили что Django ORM преобразует JSON в список
-
-    context = {
-        'card': card,
-        'menu': info['menu']
-    }
-
-    return render(request, 'cards/card_detail.html', context)
+    # Метод для обновления счетчика просмотров при каждом отображении детальной страницы карточки
+    def get_object(self, queryset=None):
+        # Получаем объект с учетом переданных в URL параметров (в данном случае, pk или id карточки)
+        obj = super().get_object(queryset=queryset)
+        # Увеличиваем счетчик просмотров на 1 с помощью F-выражения для избежания гонки условий
+        Card.objects.filter(pk=obj.pk).update(views=F('views') + 1)
+        return obj
 
 
 def preview_card_ajax(request):
@@ -215,34 +206,3 @@ class AddCardView(View):
             return redirect(card.get_absolute_url())
 
         return render(request, 'cards/add_card.html', {'form': form})
-
-
-def handle_uploaded_file(f):
-    # Создаем путь к файлу в директории uploads, имя файла берем из объекта f
-    file_path = f'uploads/{f.name}'
-
-    # Создаем папку uploads, если ее нет
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-
-
-    # Открываем файл для записи в бинарном режиме (wb+)
-    with open(file_path, "wb+") as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
-
-    return file_path
-
-
-def add_card_by_file(request):
-    if request.method == 'POST':
-
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Записываем файл на диск
-            file_path = handle_uploaded_file(request.FILES['file'])
-
-            # Редирект на страницу каталога после успешного сохранения
-            return redirect('catalog')
-    else:
-        form = UploadFileForm()
-    return render(request, 'cards/add_file_card.html', {'form': form})

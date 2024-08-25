@@ -41,7 +41,7 @@
                       <a 
                         class="page-link text-white bg-secondary" 
                         href="?page={{ page_obj.previous_page_number }}&sort={{ sort }}&order={{ order }}&{% if search_query %}search_query={{ search_query }}{% endif %}"
-                      >Предыдущая</a>
+                      ><i class="bi bi-caret-left-fill"></i></a>
                     </li>
                   {% endif %}
                   
@@ -59,7 +59,7 @@
                       <a
                         class="page-link text-white bg-secondary"
                         href="?page={{ page_obj.next_page_number }}&sort={{ sort }}&order={{ order }}&{% if search_query %}search_query={{ search_query }}{% endif %}"
-                        >Следующая</a>
+                        ><i class="bi bi-caret-right-fill"></i></a>
                     </li>
                   {% endif %}
                 </ul>
