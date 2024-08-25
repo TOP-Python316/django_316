@@ -17,7 +17,6 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from .models import Card
-from django.views.decorators.cache import cache_page
 from django.http import HttpResponseRedirect
 from .forms import CardForm, UploadFileForm
 from django.core.paginator import Paginator
@@ -76,7 +75,7 @@ class IndexView(MenuMixin, TemplateView):
     }
 
 
-class CatalogView(ListView):
+class CatalogView(MenuMixin, ListView):
     model = Card  # Указываем модель, данные которой мы хотим отобразить
     template_name = 'cards/catalog.html'  # Путь к шаблону, который будет использоваться для отображения страницы
     context_object_name = 'cards'  # Имя переменной контекста, которую будем использовать в шаблоне
@@ -98,9 +97,9 @@ class CatalogView(ListView):
         # Фильтрация карточек по поисковому запросу и сортировка
         if search_query:
             queryset = Card.objects.filter(
-                Q(question__icontains=search_query) |
-                Q(answer__icontains=search_query) |
-                Q(tags__name__icontains=search_query)
+                Q(question__iregex=search_query) |
+                Q(answer__iregex=search_query) |
+                Q(tags__name__iregex=search_query)
             ).select_related('category').prefetch_related('tags').order_by(order_by).distinct()
         else:
             queryset = Card.objects.select_related('category').prefetch_related('tags').order_by(order_by)
