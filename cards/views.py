@@ -15,15 +15,13 @@ render(запрос, шаблон, контекст=None)
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db.models import F, Q
-from django.db.models.base import Model as Model
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render
 from django.template.loader import render_to_string
-from django.views import View
-from django.views.generic.list import ListView
+from django.urls import reverse_lazy
 from django.views.generic import TemplateView, DetailView
-
-import os
+from django.views.generic.edit import CreateView
+from django.views.generic.list import ListView
 
 from .forms import CardForm
 from .models import Card
@@ -92,17 +90,10 @@ class MenuMixin:
 
 class AboutView(MenuMixin, TemplateView):
     template_name = "about.html"
-    extra_context = {
-        'cards_count': Card.objects.count(),
-        'users_count': get_user_model().objects.count()
-    }
 
 
 class IndexView(MenuMixin, TemplateView):
     template_name = "main.html"
-    extra_context = {
-        'users_count': get_user_model().objects.count()
-    }
 
 
 class CatalogView(MenuMixin, ListView):
@@ -204,33 +195,17 @@ def preview_card_ajax(request):
             'card': {
                 'question': question,
                 'answer': answer,
-                'category': 'Тестовая категория',
+                'category': category,
                 'tags': ['тест', 'тег'],
 
             }
-        }
-                                        )
+        })
         return JsonResponse({'html': html_content})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-class AddCardView(View):
-    def get(self, request):
-        """Обработка GET-запроса формы добавления карточки
-        """
-
-        form = CardForm()
-        return render(request, 'cards/add_card.html', {'form': form})
-
-    def post(self, request):
-        """Обработка POST-запроса формы добавления карточки
-        если форма валидна, то добавляем карточку в БД
-        иначе отображаем форму с ошибками
-        """
-
-        form = CardForm(request.POST)
-        if form.is_valid():
-            card = form.save()
-            return redirect(card.get_absolute_url())
-
-        return render(request, 'cards/add_card.html', {'form': form})
+class AddCardCreateView(CreateView):
+    model = Card
+    form_class = CardForm
+    template_name = 'cards/add_card.html'
+    success_url = reverse_lazy('catalog')
