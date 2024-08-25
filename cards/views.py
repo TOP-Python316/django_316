@@ -22,6 +22,7 @@ from django.http import HttpResponseRedirect
 from .forms import CardForm, UploadFileForm
 from django.core.paginator import Paginator
 from django.views import View
+from django.views.generic.list import ListView
 from django.views.generic import TemplateView
 from django.contrib.auth import get_user_model
 
@@ -55,6 +56,8 @@ class MenuMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['menu'] = info['menu']
+        context['users_count'] = get_user_model().objects.count()
+        context['cards_count'] = Card.objects.count()
         return context
 
 
@@ -68,100 +71,53 @@ class AboutView(MenuMixin, TemplateView):
 
 class IndexView(MenuMixin, TemplateView):
     template_name = "main.html"
-
     extra_context = {
         'users_count': get_user_model().objects.count()
     }
 
 
-# @cache_page(60 * 15)
-def catalog(request):
-    """Функция для отображения страницы "Каталог"
-    будет возвращать рендер шаблона /templates/cards/catalog.html
-    - **`sort`** - ключ для указания типа сортировки с возможными значениями: `date`, `views`, `adds`.
-    - **`order`** - опциональный ключ для указания направления сортировки с возможными значениями: `asc`, `desc`. По умолчанию `desc`.
-    1. Сортировка по дате добавления в убывающем порядке (по умолчанию): `/cards/catalog/`
-    2. Сортировка по количеству просмотров в убывающем порядке: `/cards/catalog/?sort=views`
-    3. Сортировка по количеству добавлений в возрастающем порядке: `/cards/catalog/?sort=adds&order=asc`
-    4. Сортировка по дате добавления в возрастающем порядке: `/cards/catalog/?sort=date&order=asc`
-    """
+class CatalogView(ListView):
+    model = Card  # Указываем модель, данные которой мы хотим отобразить
+    template_name = 'cards/catalog.html'  # Путь к шаблону, который будет использоваться для отображения страницы
+    context_object_name = 'cards'  # Имя переменной контекста, которую будем использовать в шаблоне
+    paginate_by = 30  # Количество объектов на странице
 
-    sort = request.GET.get('sort', 'upload_date')  # по умолчанию сортируем по дате загрузки
-    order = request.GET.get('order', 'desc')  # по умолчанию используем убывающий порядок
-    search_query = request.GET.get('search_query', '')  # поиск по карточкам
-    page_number = request.GET.get('page', 1)
+    # Метод для модификации начального запроса к БД
+    def get_queryset(self):
+        # Получение параметров сортировки из GET-запроса
+        sort = self.request.GET.get('sort', 'upload_date')
+        order = self.request.GET.get('order', 'desc')
+        search_query = self.request.GET.get('search_query', '')
 
-    valid_sort_fields = {'upload_date', 'views', 'adds'}
+        # Определение направления сортировки
+        if order == 'asc':
+            order_by = sort
+        else:
+            order_by = f'-{sort}'
 
-    if sort not in valid_sort_fields:
-        sort = 'upload_date'
-
-    if order == 'asc':
-        order_by = sort
-    else:
-        order_by = f'-{sort}'
-
-    if not search_query:
-        # Получаем карточки из БД в ЖАДНОМ режиме
-        cards = Card.objects.select_related('category').prefetch_related('tags').order_by(order_by)
-    else:
-        # Пробуем получить карточки по поиску в ЛЕНИВОМ режиме
-        # cards = Card.objects.filter(question__icontains=search_query).order_by(order_by)
-
-        # Пробуем получить карточки по поиску в ЖАДНОМ режиме
-        # cards = Card.objects.\
-        #     filter(question__icontains=search_query).\
-        #     select_related('category').\
-        #     prefetch_related('tags').\
-        #     order_by(order_by)
-
-        # Пробуем получить карточки по поиску в ВОПРОСЕ или в ОТВЕТЕ
-        # cards = Card.objects.\
-        #     filter(Q(question__icontains=search_query) | Q(answer__icontains=search_query)).\
-        #     select_related('category').\
-        #     prefetch_related('tags').\
-        #     order_by(order_by)
-
-        # Пробуем получить карточки по поиску в ВОПРОСЕ или в ОТВЕТЕ или в ТЕГАХ
-        # cards = Card.objects.\
-        #     filter(
-        #         Q(question__icontains=search_query) |
-        #         Q(answer__icontains=search_query) |
-        #         Q(tags__name__icontains=search_query)).\
-        #     select_related('category').\
-        #     prefetch_related('tags').\
-        #     order_by(order_by)
-
-        # Карточка повторяется столько раз сколько у неё есть тегов, для того чтобы избавиться от этого нужно использовать .distinct()
-        # cards = Card.objects.filter(Q(question__icontains=search_query) | Q(answer__icontains=search_query) | Q(tags__name__icontains=search_query)).select_related('category').prefetch_related('tags').order_by(order_by).distinct()
-        cards = Card.objects.filter(
+        # Фильтрация карточек по поисковому запросу и сортировка
+        if search_query:
+            queryset = Card.objects.filter(
                 Q(question__icontains=search_query) |
                 Q(answer__icontains=search_query) |
-                Q(tags__name__icontains=search_query)).\
-            select_related('category').\
-            prefetch_related('tags').\
-            order_by(order_by).\
-            distinct()
+                Q(tags__name__icontains=search_query)
+            ).select_related('category').prefetch_related('tags').order_by(order_by).distinct()
+        else:
+            queryset = Card.objects.select_related('category').prefetch_related('tags').order_by(order_by)
+        return queryset
 
-    # Создаём объект пагинатора и устанаваливаем кол-во карточек на странице
-    paginator = Paginator(cards, 25)
+    # Метод для добавления дополнительного контекста
+    def get_context_data(self, **kwargs):
+        # Получение существующего контекста из базового класса
+        context = super().get_context_data(**kwargs)
+        # Добавление дополнительных данных в контекст
+        context['sort'] = self.request.GET.get('sort', 'upload_date')
+        context['order'] = self.request.GET.get('order', 'desc')
+        context['search_query'] = self.request.GET.get('search_query', '')
+        # Добавление статических данных в контекст, если это необходимо
+        context['menu'] = info['menu'] # Пример добавления статических данных в контекст
+        return context
 
-    # Получаем объект страницы
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        'cards': cards,
-        'cards_count': len(cards),
-        'menu': info['menu'],
-        'page_obj': page_obj,
-        'sort': sort,
-        'order': order,
-    }
-
-    response = render(request, 'cards/catalog.html', context)
-    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'  # - кэш не используется
-    response['Expires'] = '0'  # Перестраховка - устаревание кэша
-    return response
 
 def get_categories(request):
     """
@@ -258,7 +214,7 @@ class AddCardView(View):
         if form.is_valid():
             card = form.save()
             return redirect(card.get_absolute_url())
-        
+
         return render(request, 'cards/add_card.html', {'form': form})
 
 
