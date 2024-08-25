@@ -12,22 +12,22 @@ render(запрос, шаблон, контекст=None)
     Если контекст не передан, используется пустой словарь.
 """
 
+from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.db.models import F, Q
 from django.db.models.base import Model as Model
-from django.db.models.query import QuerySet
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
-from .models import Card
-from django.http import HttpResponseRedirect
-from .forms import CardForm, UploadFileForm
-from django.core.paginator import Paginator
 from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic import TemplateView, DetailView
-from django.contrib.auth import get_user_model
 
 import os
+
+from .forms import CardForm
+from .models import Card
+
 
 info = {
     "users_count": 100500,
@@ -54,11 +54,39 @@ def index(request):
 
 
 class MenuMixin:
+    """
+    Класс-миксин для добавления меню в контекст шаблона
+    Добывает и кеширует cards_count, users_count, menu
+    """
+
+    timeout = 30
+
+    def get_menu(self):
+        menu = cache.get('menu')
+        if not menu:
+            menu = info['menu']
+            cache.set('menu', menu, self.timeout)
+        return menu
+
+    def get_cards_count(self):
+        cards_count = cache.get('cards_count')
+        if not cards_count:
+            cards_count = Card.objects.count()
+            cache.set('cards_count', cards_count, self.timeout)
+        return cards_count
+
+    def get_users_count(self):
+        users_count = cache.get('users_count')
+        if not users_count:
+            users_count = get_user_model().objects.count()
+            cache.set('users_count', users_count, self.timeout)
+        return users_count
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['menu'] = info['menu']
-        context['users_count'] = get_user_model().objects.count()
-        context['cards_count'] = Card.objects.count()
+        context['menu'] = self.get_menu()
+        context['users_count'] = self.get_cards_count()
+        context['cards_count'] = self.get_users_count()
         return context
 
 
