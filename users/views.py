@@ -13,7 +13,7 @@ def login_user(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('catalog')  # перенаправление на страницу каталога, после входа
+                return redirect(request.POST.get('next', 'catalog'))
     else:
         form = LoginUserForm()
     return render(request, 'users/login.html', {'form': form})

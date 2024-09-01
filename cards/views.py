@@ -1,18 +1,5 @@
-"""
-cards/views.py
-index - возвращает главную страницу - шаблон /templates/cards/main.html
-about - возвращает страницу "О проекте" - шаблон /templates/cards/about.html
-catalog - возвращает страницу "Каталог" - шаблон /templates/cards/catalog.html
-get_categories - возвращает все категории для представления в каталоге
-get_cards_by_category - возвращает карточки по категории для представления в каталоге
-get_cards_by_tag - возвращает карточки по тегу для представления в каталоге
-get_detail_card_by_id - возвращает детальную информацию по карточке для представления
-render(запрос, шаблон, контекст=None)
-    Возвращает объект HttpResponse с отрендеренным шаблоном шаблон и контекстом контекст.
-    Если контекст не передан, используется пустой словарь.
-"""
-
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.db.models import F, Q
 from django.http import HttpResponse, JsonResponse
@@ -208,21 +195,23 @@ def preview_card_ajax(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-class AddCardCreateView(CreateView):
+class AddCardCreateView(LoginRequiredMixin, MenuMixin, CreateView):
+    model = Card
+    form_class = CardForm
+    template_name = 'cards/add_card.html'
+    success_url = reverse_lazy('catalog')
+    login_url = reverse_lazy('users:login')  # URL для перенаправления при неавторизованном пользователе на страницу аутентификации
+    redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему
+
+
+class EditCardUpdateView(MenuMixin, UpdateView):
     model = Card
     form_class = CardForm
     template_name = 'cards/add_card.html'
     success_url = reverse_lazy('catalog')
 
 
-class EditCardUpdateView(UpdateView):
-    model = Card
-    form_class = CardForm
-    template_name = 'cards/add_card.html'
-    success_url = reverse_lazy('catalog')
-
-
-class DeleteCardView(DeleteView):
+class DeleteCardView(MenuMixin, DeleteView):
     model = Card  # Указываем модель, с которой работает представление
     success_url = reverse_lazy('catalog')  # URL для перенаправления после успешного удаления карточки
     template_name = 'cards/delete_card.html'  # Указываем шаблон, который будет использоваться для отображения формы подтверждения удаления
