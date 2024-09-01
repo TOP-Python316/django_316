@@ -852,3 +852,10 @@ _нам нужно было ограничить значения поля `stat
 - Шаблон для 404 ошибки (работает пока только в боевом режиме `DEBUG=False`, не забыть прописать `ALLOWED_HOSTS=['*']` в settings.py)
 
 **commit: `lesson_59: UpdateView и DeleteView и 404`**
+
+### Users app
+- Создали приложение `users` с помощью команды `python manage.py startapp users`
+- Подключили приложение `users` в `INSTALLED_APPS`
+- Подготовили маршруты и представления для приложения `users`
+
+**commit: `lesson_59: users app и подготовка маршрутов`**
