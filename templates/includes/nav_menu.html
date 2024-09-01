@@ -1,23 +1,35 @@
-<!--Меню было вставлено через include в базовый шаблон-->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <!-- Логотип и кнопка для мобильных версий -->
-
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Ссылки навигации -->
+    <!-- Ссылки навигации и аутентификация -->
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
+      <ul class="navbar-nav me-auto"> <!-- me-auto класс выравнивает элементы меню по левому краю -->
         {% for item in menu %}
-          <li class="nav-item">
-            <a class="nav-link {% if forloop.first %}active{% endif %}" aria-current="page" href="{% url item.url_name %}">{{ item.title }}</a>
-          </li>
-          {% if not forloop.last %}
-            <!-- В BS5 разделители в меню не являются общепринятыми, но если нужно, используйте дополнительный CSS или JS для стилизации -->
-          {% endif %}
+        <li class="nav-item">
+          <a class="nav-link {% if forloop.first %}active{% endif %}" aria-current="page" href="{% url item.url_name %}">{{ item.title }}</a>
+        </li>
         {% endfor %}
+      </ul>
+      <ul class="navbar-nav"> <!-- Элементы правой части без выравнивания по левому краю -->
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="#">Привет, {{ user.username }}!</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'users:logout' %}">Выйти</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'users:login' %}">Войти</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'users:signup' %}">Регистрация</a>
+        </li>
+        {% endif %}
       </ul>
     </div>
   </div>
