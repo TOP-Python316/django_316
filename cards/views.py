@@ -20,7 +20,7 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, DetailView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 
 from .forms import CardForm
@@ -94,6 +94,10 @@ class AboutView(MenuMixin, TemplateView):
 
 class IndexView(MenuMixin, TemplateView):
     template_name = "main.html"
+
+
+class PageNotFoundView(MenuMixin, TemplateView):
+    template_name = "404.html"
 
 
 class CatalogView(MenuMixin, ListView):
@@ -209,3 +213,16 @@ class AddCardCreateView(CreateView):
     form_class = CardForm
     template_name = 'cards/add_card.html'
     success_url = reverse_lazy('catalog')
+
+
+class EditCardUpdateView(UpdateView):
+    model = Card
+    form_class = CardForm
+    template_name = 'cards/add_card.html'
+    success_url = reverse_lazy('catalog')
+
+
+class DeleteCardView(DeleteView):
+    model = Card  # Указываем модель, с которой работает представление
+    success_url = reverse_lazy('catalog')  # URL для перенаправления после успешного удаления карточки
+    template_name = 'cards/delete_card.html'  # Указываем шаблон, который будет использоваться для отображения формы подтверждения удаления

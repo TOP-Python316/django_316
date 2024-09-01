@@ -116,10 +116,18 @@ class CardForm(forms.ModelForm):
         # Без id мы не сможем добавить теги
         instance.save()
 
-        # Обрабатываем теги
-        for tag_name in self.cleaned_data['tags']:
+        # Новый функционал для редактирования карточки (старые теги и новые теги)
+        current_tags = set(self.cleaned_data['tags'])
+
+        # Новый функционал для редактирования карточки (старые теги и новые теги)
+        for tag in instance.tags.all():
+            if tag.name not in current_tags:
+                instance.tags.remove(tag)
+
+        # Добавляем новые теги
+        for tag_name in current_tags:
             tag, created = Tag.objects.get_or_create(name=tag_name)
-            # На каждой итерации пополняется таблица много-ко-многим
+
             instance.tags.add(tag)
 
         return instance

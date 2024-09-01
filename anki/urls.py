@@ -28,3 +28,7 @@ if settings.DEBUG:
         path('__debug__/', include(debug_toolbar.urls)),
         # другие URL-паттерны
     ] + urlpatterns
+
+
+# Определяем кастомный обработчик 404 ошибки
+handler404 = views.PageNotFoundView.as_view()
