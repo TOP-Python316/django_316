@@ -200,18 +200,19 @@ class AddCardCreateView(LoginRequiredMixin, MenuMixin, CreateView):
     form_class = CardForm
     template_name = 'cards/add_card.html'
     success_url = reverse_lazy('catalog')
-    login_url = reverse_lazy('users:login')  # URL для перенаправления при неавторизованном пользователе на страницу аутентификации
     redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему
 
 
-class EditCardUpdateView(MenuMixin, UpdateView):
+class EditCardUpdateView(LoginRequiredMixin, MenuMixin, UpdateView):
     model = Card
     form_class = CardForm
     template_name = 'cards/add_card.html'
     success_url = reverse_lazy('catalog')
+    redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему
 
 
-class DeleteCardView(MenuMixin, DeleteView):
+class DeleteCardView(LoginRequiredMixin, MenuMixin, DeleteView):
     model = Card  # Указываем модель, с которой работает представление
     success_url = reverse_lazy('catalog')  # URL для перенаправления после успешного удаления карточки
     template_name = 'cards/delete_card.html'  # Указываем шаблон, который будет использоваться для отображения формы подтверждения удаления
+    redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему
