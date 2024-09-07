@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.db.models import F, Q
+from django.forms import BaseModelForm
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -201,6 +202,12 @@ class AddCardCreateView(LoginRequiredMixin, MenuMixin, CreateView):
     template_name = 'cards/add_card.html'
     success_url = reverse_lazy('catalog')
     redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему
+
+    def form_valid(self, form):
+        # Добавляем автора к карточке перед сохранением
+        form.instance.author = self.request.user
+        # Вызываем метод родительского класса перед сохранением объекта
+        return super().form_valid(form)
 
 
 class EditCardUpdateView(LoginRequiredMixin, MenuMixin, UpdateView):

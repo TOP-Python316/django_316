@@ -13,6 +13,7 @@
         <h5 class="card-title">{% markdown_to_html card.question %}</h5>
         <p class="card-text">{% markdown_to_html card.answer %}</p>
         <p class="card-text"><small class="text-muted">Категория: {{ card.category }}</small></p>
+        <p class="card-text"><small class="text-muted">Автор: {{ card.author.username|default:"неизвестен" }}</small></p>
         <p class="card-text">
           Теги:
           {% for tag in card.tags.all %}

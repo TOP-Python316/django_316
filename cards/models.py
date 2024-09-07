@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 
 
@@ -15,6 +16,7 @@ class Card(models.Model):
     adds = models.IntegerField(default=0, db_column='Favorites', verbose_name='В избранном')
     tags = models.ManyToManyField('Tag', through='CardTag', related_name='cards')
     status = models.BooleanField(default=0, choices=(map(lambda x: (bool(x[0]), x[1]), Status.choices)), verbose_name='Проверено')
+    author = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, default=None, verbose_name='Автор')
 
     class Meta:
         db_table = 'Cards'  # имя таблицы в базе данных
