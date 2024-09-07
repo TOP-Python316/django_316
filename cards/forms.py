@@ -92,7 +92,7 @@ class CardForm(forms.ModelForm):
         fields = ['question', 'answer', 'category', 'tags']  # поля, которые будут в форме и их порядок
 
         # Виджеты для полей
-        widgets =  {
+        widgets = {
             'question': forms.TextInput(attrs={'class': 'form-control'})
         }
 
