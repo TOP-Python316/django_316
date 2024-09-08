@@ -931,3 +931,13 @@ _нам нужно было ограничить значения поля `stat
 - Протестировали хеширование пароля (Есть!)
 
 **commit: `lesson_61: класс регистрации пользователя RegisterUser`**
+
+### Авторизация опционально через email или username
+
+- Создаем файл бэкенда аутентификации `users/authentication.py`
+- Определяем в нем собственный бэкенд
+- Подключаем его в настройках `AUTHENTICATION_BACKENDS`
+- Указываем там стандартный бэкенд `django.contrib.auth.backends.ModelBackend` и наш собственный `users.authentication.EmailAuthBackend`
+- Поправили форму входа `LoginUserForm` (подпись что вы можете войти по email или username)
+
+**commit: `lesson_61: авторизация опционально через email или username`**
