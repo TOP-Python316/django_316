@@ -1,7 +1,7 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import redirect, reverse, render
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, CreateView
 
 from .forms import CustomAuthenticationForm, RegisterUserForm
 from cards.views import MenuMixin
@@ -23,19 +23,11 @@ class LogoutUser(MenuMixin, LogoutView):
     next_page = reverse_lazy('users:login')
 
 
-def signup_user(request):
-    if request.method == 'POST':
-        form = RegisterUserForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
-            user.save()
-            return redirect(reverse('users:register_done'))  # после регистрации перенаправляем пользователя на главную страницу
-
-    else:
-        form = RegisterUserForm()
-
-    return render(request, 'users/register.html', {'form': form})
+class RegisterUser(MenuMixin, CreateView):
+    form_class = RegisterUserForm
+    template_name = 'users/register.html'
+    extra_context = {'title': 'Регистрация'}
+    success_url = reverse_lazy('users:login')
 
 
 class RegisterDoneView(MenuMixin, TemplateView):
