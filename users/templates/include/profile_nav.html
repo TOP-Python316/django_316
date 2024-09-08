@@ -1,0 +1,13 @@
+{% comment %} users/templates/include/profile_nav.thml
+Это работает на переменной active_tab, которая передается в контексте шаблона.
+Значения: profile, password_change, profile_cards
+{% endcomment %}
+
+<!-- navigation.html -->
+<nav id="navbar-example3" class="flex-column align-items-stretch pe-3">
+    <nav class="nav nav-pills flex-column">
+        <a class="nav-link {% if active_tab == 'profile' %}active bg-dark text-light{% else %}text-dark{% endif %}" href="{% url 'users:profile' %}">Профиль</a>
+        <a class="nav-link {% if active_tab == 'password_change' %}active bg-dark text-light{% else %}text-dark{% endif %}" href="{% url 'users:password_change' %}">Сменить пароль</a>
+        <a class="nav-link {% if active_tab == 'profile_cards' %}active bg-dark text-light{% else %}text-dark{% endif %}" href="{% url 'users:profile_cards' %}">Мои карточки</a>
+    </nav>
+</nav>
