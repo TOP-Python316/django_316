@@ -1,8 +1,11 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from django.views.decorators.cache import cache_page
+
 from anki import settings
 from cards import views
-from django.views.decorators.cache import cache_page
 
 
 admin.site.site_header = 'Управление сайтом ANKI'  # текст в шапке админ. панели
@@ -21,6 +24,11 @@ urlpatterns = [
     path('cards/', include('cards.urls')),
     path('users/', include('users.urls', namespace='users')),
 ]
+
+
+# добавляем обработку медиафайлов
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
 if settings.DEBUG:
     import debug_toolbar

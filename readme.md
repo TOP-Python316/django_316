@@ -1163,3 +1163,40 @@ class User(AbstractUser):
 Сначала создаём миграции, применяем их, и только потом подключаем новую модель пользователя в `settings.py` — `AUTH_USER_MODEL = 'users.User'` 
 
 **commit: `lesson_62: расширил модель пользователя`**
+
+- MEDIA_ROOT - корневой каталог для загружаемых файлов
+- MEDIA_URL - URL, по которому можно получить доступ к загружаемым файлам
+
+```python
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+```
+
+**commit: `lesson_62: расширил модель пользователя`**
+
+- Правки в главный `urls.py` для отображения медиафайлов
+
+```python
+from django.conf.urls.static import static
+from django.conf import settings
+if settings.DEBUG:
+    import debug_toolbar
+
+    urlpatterns = [
+                      path('__debug__/', include(debug_toolbar.urls)),
+                      # другие URL-паттерны
+                  ] + urlpatterns
+
+    # Добавляем обработку медиафайлов
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+- Правки в `nav_menu.html` для кликабельности username
+
+```html
+ <a class="nav-link" href="{% url 'users:profile' %}">{{ user.username }}</a>
+```
+
+А так же мелкие правки в стили для отображения фотографии пользователя
+
+**commit: `lesson_62: добавили аватар в профиле`**

@@ -1,11 +1,25 @@
 {% extends "users/base_profile.html" %}
 {% load static %}
+
+{% comment %} Добавим стили - чтобы фотография была кругом и не более 400 пикселей {% endcomment %}
+{% block head %}
+<style>
+  .profile-img {
+    border-radius: 45%;
+    max-width: 400px;
+    {% comment %} Выравнивание по центру {% endcomment %}
+  }
+</style>
+{% endblock %}
+
 {% block content_profile %}
 {% comment %} ТУТ Форма профиля {% endcomment %} 
 <h2>Изменение профиля</h2>
 {% comment %} Выводим фото пользователя в Image fluid BS5 {% endcomment %}
 {% if user.photo %}
-  <img src="{{ user.photo.url }}" class="img-fluid" alt="Тут фото {{ user.username }}">
+  <div class="text-center mt-5 mb-3">
+    <img class="profile-img" src="{{ user.photo.url }}" class="img-fluid" alt="Тут фото {{ user.username }}">
+  </div>
 {% endif %}
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}

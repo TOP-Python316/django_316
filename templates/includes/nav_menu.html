@@ -17,7 +17,7 @@
       <ul class="navbar-nav"> <!-- Элементы правой части без выравнивания по левому краю -->
         {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="#">Привет, {{ user.username }}!</a>
+          <a class="nav-link" href="{% url 'users:profile' %}">{{ user.username }}!</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'users:logout' %}">Выйти</a>
