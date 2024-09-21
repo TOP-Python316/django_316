@@ -1397,4 +1397,137 @@ if DEBUG:
     INTERNAL_IPS = [
         '127.0.0.1',
     ]
+
 **commit: `lesson_64: дополнительная настройка для работы проекта`**
+
+### Обзор протокола OAuth2.0
+1. Введение в OAuth2.0 и его принципы.
+2. Различия между OAuth и OpenID Connect.
+3. Пример работы OAuth2.0 на практике в Django.
+### Подготовка проекта к авторизации через соцсети
+1. Устанавливаем библиотеку `social-auth-app-django` и добавляем ее в `requirements.txt`
+https://python-social-auth.readthedocs.io/en/latest/index.html
+`pip install social-auth-app-django`
+`pip freeze > requirements.txt`
+2. Добавляем приложение `social_django` в `INSTALLED_APPS` в `settings.py`
+```python
+INSTALLED_APPS = [
+    ...
+    'social_django',
+]
+```
+1. Добавляем настройки `settings.py`
+AUTHENTICATION_BACKENDS - список бэкендов аутентификации, для работы с соцсетями
+MIDDLEWARE - список промежуточных слоев, для обработки исключений
+TEMPLATES - список контекстных процессоров, для передачи данных в шаблоны
+SOCIAL_AUTH_URL_NAMESPACE - пространство имен для URL-адресов авторизации
+```python
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.vk.VKOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+########
+MIDDLEWARE = [
+    ...
+    'social_django.middleware.SocialAuthExceptionMiddleware',
+]
+########
+TEMPLATES = [
+    {
+        ...
+        'OPTIONS': {
+            'context_processors': [
+                ...
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
+            ],
+        },
+    },
+]
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+```
+2. Добавляем в `.env` и `env.example` переменные для авторизации через GitHub и VK
+GITHUB_KEY=None
+GITHUB_SECRET=None
+VK_KEY=None
+VK_SECRET=None
+3. Настройки в `settings.py` для авторизации через GitHub и VK
+```python
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_GITHUB_KEY = os.getenv('GITHUB_KEY')
+SOCIAL_AUTH_GITHUB_SECRET = os.getenv('GITHUB_SECRET')
+SOCIAL_AUTH_VK_OAUTH2_KEY = os.getenv('VK_KEY')
+SOCIAL_AUTH_VK_OAUTH2_SECRET = os.getenv('VK_SECRET')
+LOGIN_REDIRECT_URL = '/users/profile/'
+LOGOUT_REDIRECT_URL = '/'
+```
+4. Добавляем URL-адреса для авторизации через соцсети в `urls.py`
+```python
+from django.urls import include, path
+urlpatterns = [
+    ...
+    path('social-auth/', include('social_django.urls', namespace='social')),
+]
+```
+5. Добавляем в шаблон `profile.html` кнопки для авторизации через GitHub и VK
+```html
+<form method="post" action="{% url 'users:link_social_account' %}">
+  {% csrf_token %}
+  <button type="submit" name="provider" value="github" class="btn btn-dark">Привязать GitHub</button>
+  <button type="submit" name="provider" value="vk" class="btn btn-dark">Привязать VK</button>
+</form>
+```
+6. Создаем представление для привязки соцсетей к пользователю в `views.py` приложения `users`
+```python
+from django.views import View
+from django.shortcuts import redirect
+from social_django.utils import psa
+class SocialAuthView(View):
+    @psa('social:complete')
+    def save_oauth_data(self, request, backend):
+        user = request.user
+        if backend.name == 'github':
+            user.github_id = backend.get_user_id(request)
+        elif backend.name == 'vk':
+            user.vk_id = backend.get_user_id(request)
+        user.save()
+        return redirect('users:profile')
+    def post(self, request, *args, **kwargs):
+        if 'provider' in request.POST:
+            provider = request.POST['provider']
+            if provider == 'github':
+                return redirect('social:begin', backend='github')
+            elif provider == 'vk':
+                return redirect('social:begin', backend='vk')
+        return redirect('users:profile')
+```
+### Обновление моделей и представлений
+1. Добавление полей для хранения данных соцсетей в модель пользователя.
+```python
+class User(AbstractUser):
+    ...
+    github_id = models.CharField(max_length=255, blank=True, null=True)
+    vk_id = models.CharField(max_length=255, blank=True, null=True)
+```
+2. Создание миграций и применение изменений в базе данных.
+`python manage.py makemigrations`
+`python manage.py migrate`
+### Обновление маршрутов
+1. Добавление маршрутов для авторизации через соцсети в `urls.py` приложения `users`.
+```python
+from django.urls import path
+from .views import SocialAuthView
+urlpatterns = [
+    ...
+    path('link-social-account/', SocialAuthView.as_view(), name='link_social_account'),
+    path('save-oauth-data/<str:backend>/', SocialAuthView.as_view(), name='save_oauth_data'),
+]
+```
+### Обновление шаблона login.html
+```html
+ <h3>Или зайдите через:</h3>
+            <a href="{% url 'social:begin' 'vk' %}" class="btn btn-dark">ВКонтакте</a>
+            <a href="{% url 'social:begin' 'github' %}" class="btn btn-dark">GitHub</a>
+```
+**commit: `lesson_64: настройки приложения для авторизации через соцсети`**

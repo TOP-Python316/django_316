@@ -17,6 +17,13 @@
 {% block content_profile %}
 {% comment %} ТУТ Форма профиля {% endcomment %} 
 <h2>Изменение профиля</h2>
+
+<form method="post" action="{% url 'users:link_social_account' %}">
+  {% csrf_token %}
+  <button type="submit" name="provider" value="github" class="btn btn-dark">Привязать GitHub</button>
+  <button type="submit" name="provider" value="vk" class="btn btn-dark">Привязать VK</button>
+</form>
+
 {% comment %} Выводим фото пользователя в Image fluid BS5 {% endcomment %}
 {% if user.photo %}
   <div class="text-center mt-5 mb-3">

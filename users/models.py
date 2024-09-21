@@ -14,6 +14,8 @@ class User(AbstractUser):
         blank=True,
         verbose_name='Дата рождения'
     )
+    github_id = models.CharField(max_length=255, blank=True, null=True)
+    vk_id = models.CharField(max_length=255, blank=True, null=True)
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='custom_user_set',
