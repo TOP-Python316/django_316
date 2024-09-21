@@ -1531,3 +1531,5 @@ urlpatterns = [
             <a href="{% url 'social:begin' 'github' %}" class="btn btn-dark">GitHub</a>
 ```
 **commit: `lesson_64: настройки приложения для авторизации через соцсети`**
+
+**commit: `lesson_64: FIX VK Oauth`**
