@@ -5,3 +5,4 @@ venv
 *.db
 __pycache__
 media
+.env
