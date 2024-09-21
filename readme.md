@@ -1379,3 +1379,22 @@ services:
 ### Заключение
 
 **commit: `lesson_63: информация о Docker`**
+
+
+## Lesson 64
+
+1. Настройка `DEBUG` в `settings.py` для отладочного режима. Чтобы на сервере не отображались отладочные сообщения, установите `DEBUG = False` и добавьте домен сервера в список `ALLOWED_HOSTS`.
+DEBUG = os.getenv('DEBUG')
+2. Настройка `ALLOWED_HOSTS` в `settings.py` для домена cardslurm.ru.
+ALLOWED_HOSTS - это список хостов, которые могут обращаться к нашему сайту
+ALLOWED_HOSTS = ['cardslurm.ru', 'www.cardslurm.ru', 'localhost', '127.0.0.1']
+3. Настройка CSRF_TRUSTED_ORIGINS в `settings.py` для безопасной работы с формами.
+CSRF_TRUSTED_ORIGINS - это список доменов, с которых можно отправлять POST-запросы без токена CSRF
+CSRF_TRUSTED_ORIGINS = ['https://cardslurm.ru', 'https://www.cardslurm.ru']
+4. Добавление IF DEBUG для отладочной панели Django.
+INTERNAL_IPS  - это список IP-адресов, с которых можно получить доступ к отладочной панели Django
+if DEBUG:    
+    INTERNAL_IPS = [
+        '127.0.0.1',
+    ]
+**commit: `lesson_64: дополнительная настройка для работы проекта`**

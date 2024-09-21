@@ -29,13 +29,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = ['*']
-
-INTERNAL_IPS = [
+# это список хостов, которые могут обрщаться к нашему сайту
+ALLOWED_HOSTS = [
+    'cardslurm.ru',
+    'www.cardslurm.ru',
     '127.0.0.1',
+    'localhost'
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://cardslurm.ru',
+    'https://www.cardslurm.ru',
+]
+
+if DEBUG:
+    INTERNAL_IPS = [
+        '127.0.0.1',
+    ]
 
 
 # Application definition
