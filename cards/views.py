@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.cache import cache
 from django.db.models import F, Q
 from django.forms import BaseModelForm
@@ -196,12 +196,13 @@ def preview_card_ajax(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-class AddCardCreateView(LoginRequiredMixin, MenuMixin, CreateView):
+class AddCardCreateView(LoginRequiredMixin, PermissionRequiredMixin, MenuMixin, CreateView):
     model = Card
     form_class = CardForm
     template_name = 'cards/add_card.html'
     success_url = reverse_lazy('catalog')
     redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему
+    permission_required = 'cards.add_card'
 
     def form_valid(self, form):
         # Добавляем автора к карточке перед сохранением
@@ -210,16 +211,18 @@ class AddCardCreateView(LoginRequiredMixin, MenuMixin, CreateView):
         return super().form_valid(form)
 
 
-class EditCardUpdateView(LoginRequiredMixin, MenuMixin, UpdateView):
+class EditCardUpdateView(LoginRequiredMixin, PermissionRequiredMixin, MenuMixin, UpdateView):
     model = Card
     form_class = CardForm
     template_name = 'cards/add_card.html'
     success_url = reverse_lazy('catalog')
     redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему
+    permission_required = 'cards.change_card'  # Указываем право, которое нужно иметь пользователю достпа к приложению
 
 
-class DeleteCardView(LoginRequiredMixin, MenuMixin, DeleteView):
+class DeleteCardView(LoginRequiredMixin, PermissionRequiredMixin, MenuMixin, DeleteView):
     model = Card  # Указываем модель, с которой работает представление
     success_url = reverse_lazy('catalog')  # URL для перенаправления после успешного удаления карточки
     template_name = 'cards/delete_card.html'  # Указываем шаблон, который будет использоваться для отображения формы подтверждения удаления
     redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему
+    permission_required = 'cards.delete_card'
