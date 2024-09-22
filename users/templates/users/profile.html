@@ -16,7 +16,12 @@
 
 {% block content_profile %}
 {% comment %} ТУТ Форма профиля {% endcomment %} 
-<h2>Изменение профиля</h2>
+<h2>Изменение профиля
+  {% comment %} Если пользователь состоит в группе "Модераторы" {% endcomment %}
+    {% if user.moderator %}
+      <i class="bi bi-vector-pen"></i>
+    {% endif %}
+  </h2>
 
 <form method="post" action="{% url 'users:link_social_account' %}">
   {% csrf_token %}
