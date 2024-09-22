@@ -1609,3 +1609,44 @@ def get_object(self, queryset=None):
 И отрисовали ручку для модераторов в шаблоне личного кабинета.
 
 **commit: `lesson_65: добавил иконку ручки для модераторов в админке (работа с шаблонами)`**
+
+Создаем команду для создания группы модераторов и выдачи прав на редактирование карточек
+Создаем для этого в приложении users пакет management/commands и в нем файл create_moderators_group.py
+```python
+from django.core.management.base import BaseCommand
+from django.contrib.auth.models import Group, Permission
+from django.contrib.contenttypes.models import ContentType
+from your_app_name.models import Card  # Замените 'your_app_name' на имя вашего приложения
+
+class Command(BaseCommand):
+    help = 'Создание группы Модераторы и назначение права change_card'
+    def handle(self, *args, **kwargs):
+        # Создаем или получаем группу "Модераторы"
+        moderators_group, created = Group.objects.get_or_create(name='Модераторы')
+        
+        # Получаем контентный тип для модели Card
+        content_type = ContentType.objects.get_for_model(Card)
+        
+        # Получаем разрешение change_card
+        change_card_permission = Permission.objects.get(codename='change_card', content_type=content_type)
+        
+        # Добавляем разрешение группе "Модераторы"
+        moderators_group.permissions.add(change_card_permission)
+        
+        if created:
+            self.stdout.write(self.style.SUCCESS("Группа 'Модераторы' создана и права назначены!"))
+        else:
+            self.stdout.write(self.style.SUCCESS("Группа 'Модераторы' уже существует и права обновлены!"))
+```
+Модифицируем команду автодеплоя на севрере timeweb
+
+```bash
+python3 manage.py migrate && \
+echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'ad@ad.com', '12345')" | python3 manage.py shell && \
+python3 manage.py loaddata dump.json && \
+python3 manage.py create_moderators_group
+```
+Т.е. все что мы прописали в файле create_moderators_group.py будет выполнено при деплое на сервере
+всего одной командой `python3 manage.py create_moderators_group` (по названию файла)
+
+**commit: `lesson_65: создал команду для создания группы модераторов и выдачи прав на редактирование карточек`**
