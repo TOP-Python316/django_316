@@ -10,13 +10,15 @@ from .telegram_bot import send_telegram_message
 
 @receiver(post_save, sender=Card)
 def send_telegram_notification(sender, instance, created, **kwargs):
-    if created:
-        message = f"""
-*Новая карточка!*
+    message_template = f"""
 *Вопрос:* {instance.question}
 *Ответ:* {instance.answer}
 *Категория:* {instance.category}
-*Теги:* {', '.join(instance.tags.all().values_list('name', flat=True))}
 *Автор:* {instance.author}
-        """
-        asyncio.run(send_telegram_message(TELEGRAM_BOT_TOKEN, YOUR_PERSONAL_CHAT_ID, message))
+"""
+    if created:
+        message = '*Новая карточка!*\n' + message_template
+    else:
+        message = f'*Карточка* {instance.id} изменена:\n' + message_template
+
+    asyncio.run(send_telegram_message(TELEGRAM_BOT_TOKEN, YOUR_PERSONAL_CHAT_ID, message))
