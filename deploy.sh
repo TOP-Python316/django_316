@@ -1,0 +1,2 @@
+#! /bin/bash
+python3 manage.py migrate && echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'ad@ad.com', '12345')" | python3 manage.py shell && python3 manage.py create_moderators_group && python3 manage.py loaddata dump.json
