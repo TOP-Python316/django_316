@@ -1916,3 +1916,155 @@ Test-Driven Development — это мощная методология, кото
 - [Официальная документация Django по тестированию](https://docs.djangoproject.com/en/stable/topics/testing/)
 
 **commit: `lesson_67: Test-Driven Development`**
+
+Конечно, давайте разберем код по частям и добавим подробные комментарии.
+
+### Импорт необходимых модулей
+```python
+from django.test import TestCase
+from django.urls import reverse
+from django.contrib.auth import get_user_model
+from .models import Card, Category, Tag
+```
+- `TestCase`: Базовый класс для тестов в Django.
+- `reverse`: Функция для генерации URL-адресов на основе имени маршрута.
+- `get_user_model`: Функция для получения модели пользователя, используемой в проекте.
+- `Card`, `Category`, `Tag`: Модели, которые будут тестироваться.
+
+### Тестирование модели Card
+```python
+class CardModelTest(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username='admin', password='89HoS07pIs30')
+        self.category = Category.objects.create(name='JavaScript')
+        self.tag = Tag.objects.create(name='tags')
+        self.card = Card.objects.create(
+            question='new card',
+            answer='for bot',
+            category=self.category,
+            author=self.user,
+            status=Card.Status.UNCHECKED
+        )
+        self.card.tags.add(self.tag)
+```
+- `setUp`: Метод, который выполняется перед каждым тестом. Здесь создаются объекты пользователя, категории, тега и карточки.
+
+```python
+    def test_card_creation(self):
+        self.assertEqual(self.card.question, 'new card')
+        self.assertEqual(self.card.answer, 'for bot')
+        self.assertEqual(self.card.category, self.category)
+        self.assertEqual(self.card.author, self.user)
+        self.assertEqual(self.card.status, Card.Status.UNCHECKED)
+        self.assertIn(self.tag, self.card.tags.all())
+```
+- `test_card_creation`: Тест, который проверяет, что карточка была создана с правильными значениями.
+
+```python
+    def test_card_str(self):
+        self.assertEqual(str(self.card), f'Карточка {self.card.question} - {self.card.answer[:50]}')
+```
+- `test_card_str`: Тест, который проверяет, что строковое представление карточки соответствует ожидаемому формату.
+
+### Тестирование модели Category
+```python
+class CategoryModelTest(TestCase):
+    def setUp(self):
+        self.category = Category.objects.create(name='JavaScript')
+```
+- `setUp`: Метод, который создает объект категории перед каждым тестом.
+
+```python
+    def test_category_creation(self):
+        self.assertEqual(self.category.name, 'JavaScript')
+```
+- `test_category_creation`: Тест, который проверяет, что категория была создана с правильным именем.
+
+```python
+    def test_category_str(self):
+        self.assertEqual(str(self.category), f'Категория {self.category.name}')
+```
+- `test_category_str`: Тест, который проверяет, что строковое представление категории соответствует ожидаемому формату.
+
+### Тестирование модели Tag
+```python
+class TagModelTest(TestCase):
+    def setUp(self):
+        self.tag = Tag.objects.create(name='tags')
+```
+- `setUp`: Метод, который создает объект тега перед каждым тестом.
+
+```python
+    def test_tag_creation(self):
+        self.assertEqual(self.tag.name, 'tags')
+```
+- `test_tag_creation`: Тест, который проверяет, что тег был создан с правильным именем.
+
+```python
+    def test_tag_str(self):
+        self.assertEqual(str(self.tag), f'Тег {self.tag.name}')
+```
+- `test_tag_str`: Тест, который проверяет, что строковое представление тега соответствует ожидаемому формату.
+
+### Тестирование представлений (views)
+```python
+class CardViewsTest(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username='admin', password='89HoS07pIs30')
+        self.category = Category.objects.create(name='JavaScript')
+        self.tag = Tag.objects.create(name='tags')
+        self.card = Card.objects.create(
+            question='JavaScript',
+            answer='JavaScript',
+            category=self.category,
+            author=self.user,
+            status=Card.Status.UNCHECKED
+        )
+        self.card.tags.add(self.tag)
+```
+- `setUp`: Метод, который создает объекты пользователя, категории, тега и карточки перед каждым тестом.
+
+```python
+    def test_catalog_view(self):
+        response = self.client.get(reverse('catalog'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'cards/catalog.html')
+```
+- `test_catalog_view`: Тест, который проверяет, что представление каталога возвращает статус 200 и использует правильный шаблон.
+
+```python
+    def test_card_detail_view(self):
+        response = self.client.get(reverse('detail_card_by_id', kwargs={'pk': self.card.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'cards/card_detail.html')
+```
+- `test_card_detail_view`: Тест, который проверяет, что представление детализации карточки возвращает статус 200 и использует правильный шаблон.
+
+```python
+    def test_add_card_view(self):
+        self.client.login(username='admin', password='89HoS07pIs30')
+        response = self.client.get(reverse('add_card'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'cards/add_card.html')
+```
+- `test_add_card_view`: Тест, который проверяет, что представление добавления карточки возвращает статус 200 и использует правильный шаблон. Также выполняется вход пользователя.
+
+```python
+    def test_edit_card_view(self):
+        self.client.login(username='admin', password='89HoS07pIs30')
+        response = self.client.get(reverse('edit_card', kwargs={'pk': self.card.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'cards/add_card.html')
+```
+- `test_edit_card_view`: Тест, который проверяет, что представление редактирования карточки возвращает статус 200 и использует правильный шаблон. Также выполняется вход пользователя.
+
+```python
+    def test_delete_card_view(self):
+        self.client.login(username='admin', password='89HoS07pIs30')
+        response = self.client.get(reverse('delete_card', kwargs={'pk': self.card.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'cards/delete_card.html')
+```
+- `test_delete_card_view`: Тест, который проверяет, что представление удаления карточки возвращает статус 200 и использует правильный шаблон. Также выполняется вход пользователя.
+
+**commit: `lesson_67: написали автотесты`**
