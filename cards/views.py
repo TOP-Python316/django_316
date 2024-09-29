@@ -6,23 +6,23 @@ from django.contrib.auth.mixins import (
 )
 from django.core.cache import cache
 from django.db.models import F, Q
-from django.forms import BaseModelForm
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import (
+    CreateView,
+    UpdateView,
+    DeleteView
+)
 from django.views.generic.list import ListView
 
 from .forms import CardForm
-from .models import Card
+from .models import Card, Category
 
 
 info = {
-    "users_count": 100500,
-    "cards_count": 200600,
-    # "menu": ['Главная', 'О проекте', 'Каталог']
     "menu": [
         {"title": "Главная",
          "url": "/",
@@ -35,12 +35,6 @@ info = {
          "url_name": "catalog"},
     ],
 }
-
-
-def index(request):
-    """Функция для отображения главной страницы
-    будет возвращать рендер шаблона root/templates/main.html"""
-    return render(request, "main.html", info)
 
 
 class MenuMixin:
@@ -135,19 +129,22 @@ class CatalogView(MenuMixin, ListView):
         return context
 
 
-def get_categories(request):
-    """
-    Возвращает все категории для представления в каталоге
-    """
-    # Проверка работы базового шаблона
-    return render(request, 'base.html', info)
+class CardByCategoryListView(MenuMixin, ListView):
+    model = Card
+    template_name = 'cards/catalog.html'
+    context_object_name = 'cards'
+    paginate_by = 30
 
+    def get_queryset(self):
+        name = self.kwargs.get('name')
+        category = get_object_or_404(Category, name=name)
 
-def get_cards_by_category(request, slug):
-    """
-    Возвращает карточки по категории для представления в каталоге
-    """
-    return HttpResponse(f'Cards by category {slug}')
+        return Card.objects.filter(category=category)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = get_object_or_404(Category, name=self.kwargs.get('name'))
+        return context
 
 
 def get_cards_by_tag(request, tag_id):
@@ -200,7 +197,12 @@ def preview_card_ajax(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-class AddCardCreateView(LoginRequiredMixin, PermissionRequiredMixin, MenuMixin, CreateView):
+class AddCardCreateView(
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    MenuMixin,
+    CreateView
+):
     model = Card
     form_class = CardForm
     template_name = 'cards/add_card.html'

@@ -12,7 +12,9 @@
       <div class="card-body">
         <h5 class="card-title">{% markdown_to_html card.question %}</h5>
         <p class="card-text">{% markdown_to_html card.answer %}</p>
-        <p class="card-text"><small class="text-muted">Категория: {{ card.category }}</small></p>
+        <a href="{% url 'get_cards_by_category' name=card.category.name %}" class="text-white">
+          <p class="card-text"><small class="text-muted">{{ card.category }}</small></p>
+        </a
         <p class="card-text"><small class="text-muted">Автор: {{ card.author.username|default:"неизвестен" }}</small></p>
         <p class="card-text">
           Теги:
