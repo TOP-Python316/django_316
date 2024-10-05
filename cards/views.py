@@ -1,24 +1,28 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UserPassesTestMixin
+)
 from django.core.cache import cache
 from django.db.models import F, Q
-from django.forms import BaseModelForm
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import (
+    CreateView,
+    UpdateView,
+    DeleteView
+)
 from django.views.generic.list import ListView
 
 from .forms import CardForm
-from .models import Card
+from .models import Card, Category
 
 
 info = {
-    "users_count": 100500,
-    "cards_count": 200600,
-    # "menu": ['Главная', 'О проекте', 'Каталог']
     "menu": [
         {"title": "Главная",
          "url": "/",
@@ -31,12 +35,6 @@ info = {
          "url_name": "catalog"},
     ],
 }
-
-
-def index(request):
-    """Функция для отображения главной страницы
-    будет возвращать рендер шаблона root/templates/main.html"""
-    return render(request, "main.html", info)
 
 
 class MenuMixin:
@@ -131,19 +129,22 @@ class CatalogView(MenuMixin, ListView):
         return context
 
 
-def get_categories(request):
-    """
-    Возвращает все категории для представления в каталоге
-    """
-    # Проверка работы базового шаблона
-    return render(request, 'base.html', info)
+class CardByCategoryListView(MenuMixin, ListView):
+    model = Card
+    template_name = 'cards/catalog.html'
+    context_object_name = 'cards'
+    paginate_by = 30
 
+    def get_queryset(self):
+        name = self.kwargs.get('name')
+        category = get_object_or_404(Category, name=name)
 
-def get_cards_by_category(request, slug):
-    """
-    Возвращает карточки по категории для представления в каталоге
-    """
-    return HttpResponse(f'Cards by category {slug}')
+        return Card.objects.filter(category=category)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = get_object_or_404(Category, name=self.kwargs.get('name'))
+        return context
 
 
 def get_cards_by_tag(request, tag_id):
@@ -196,12 +197,18 @@ def preview_card_ajax(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-class AddCardCreateView(LoginRequiredMixin, MenuMixin, CreateView):
+class AddCardCreateView(
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    MenuMixin,
+    CreateView
+):
     model = Card
     form_class = CardForm
     template_name = 'cards/add_card.html'
     success_url = reverse_lazy('catalog')
     redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему
+    permission_required = 'cards.add_card'
 
     def form_valid(self, form):
         # Добавляем автора к карточке перед сохранением
@@ -210,16 +217,35 @@ class AddCardCreateView(LoginRequiredMixin, MenuMixin, CreateView):
         return super().form_valid(form)
 
 
-class EditCardUpdateView(LoginRequiredMixin, MenuMixin, UpdateView):
+class EditCardUpdateView(
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    MenuMixin,
+    UserPassesTestMixin,
+    UpdateView
+):
     model = Card
     form_class = CardForm
     template_name = 'cards/add_card.html'
     success_url = reverse_lazy('catalog')
     redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему
+    permission_required = 'cards.change_card'  # Указываем право, которое нужно иметь пользователю достпа к приложению
+
+    def test_func(self):
+        card = self.get_object()
+        user = self.request.user
+        is_moderator = user.groups.filter(name='Moderators').exists()
+        is_administrator = user.is_superuser
+
+        return user == card.author or is_moderator or is_administrator
+
+    def handle_no_permission(self):
+        return super().handle_no_permission()
 
 
-class DeleteCardView(LoginRequiredMixin, MenuMixin, DeleteView):
+class DeleteCardView(LoginRequiredMixin, PermissionRequiredMixin, MenuMixin, DeleteView):
     model = Card  # Указываем модель, с которой работает представление
     success_url = reverse_lazy('catalog')  # URL для перенаправления после успешного удаления карточки
     template_name = 'cards/delete_card.html'  # Указываем шаблон, который будет использоваться для отображения формы подтверждения удаления
     redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему
+    permission_required = 'cards.delete_card'

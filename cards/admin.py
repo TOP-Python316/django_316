@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Card
+from .models import Card, Category
 from django.contrib.admin import SimpleListFilter
 
 
@@ -54,6 +54,11 @@ class CardAdmin(admin.ModelAdmin):
         has_code = 'Да' if '```' in card.answer else 'Нет'  # проверяем наличие кода
         return has_code
 
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name')
+    ordering = ('pk',)
 
 # сначала задаётся класс, который добавляет модель в админку
 # потом этот класс связывается с админкой через admin.site.register()
